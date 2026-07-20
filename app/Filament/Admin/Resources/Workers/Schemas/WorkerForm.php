@@ -18,7 +18,6 @@ class WorkerForm
     /**
      * Filament v4/v5-এ TextInput::stripTags() মেথডটি নেই (v2-তে ছিল, রিমুভ হয়ে গেছে)।
      * তাই এই helper দিয়ে dehydrateStateUsing() ব্যবহার করে একই কাজ করা হচ্ছে।
-     * যেকোনো TextInput-এ চাইলে ->dehydrateStateUsing(self::stripTags()) যোগ করতে পারো।
      */
     protected static function stripTags(): \Closure
     {
@@ -42,10 +41,8 @@ class WorkerForm
                         ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                         ->disk('public')
                         ->directory('worker-photos')
-                        // Step 10.8e Fix: আপলোডের আগেই browser-এ (filepond) resize হয় —
-                        // কোনো সার্ভার-সাইড image library (Intervention/GD) লাগে না, তাই
-                        // Namecheap shared hosting-এর জন্য নিরাপদ। এতে বড় মোবাইল ফটো
-                        // (৪০০০×৩০০০px) অপ্রয়োজনীয় bandwidth/storage নষ্ট করবে না।
+                        ->visibility('public')
+                        ->dehydrated(true)
                         ->imageResizeMode('cover')
                         ->imageResizeTargetWidth('600')
                         ->imageResizeTargetHeight('600')
