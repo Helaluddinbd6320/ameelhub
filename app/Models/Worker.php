@@ -13,28 +13,6 @@ class Worker extends Model
 {
     use SoftDeletes;
 
-    /**
-     * SECURITY FIX (Step 10.7 audit):
-     * ১) আগে এই মডেলে $fillable এবং $guarded দুটোই define করা ছিল।
-     *    Laravel এ isFillable() চেক করার সময় কোনো field $fillable এ
-     *    থাকলে সেটা সাথে সাথেই allow হয়ে যায় — $guarded তখন চেক-ই হয়
-     *    না। এখন কোনো conflict ছিল না বলে সমস্যা হয়নি, কিন্তু ভবিষ্যতে
-     *    কেউ ভুলবশত কোনো guarded field (যেমন approved_at) $fillable এ
-     *    যোগ করে দিলে সেটা নীরবে mass-assignable হয়ে যেত। তাই এখন
-     *    AgentProfile-এর মতো শুধু $guarded প্যাটার্নে switch করা হলো —
-     *    ভবিষ্যতে নতুন কলাম যোগ হলে ডিফল্টভাবে সুরক্ষিত থাকবে।
-     * ২) cv_notes (Admin-only internal note) এবং rejection_reason
-     *    (শুধু Admin সেট করে, worker শুধু দেখতে পারে) আগে fillable ছিল,
-     *    guarded ছিল না। এখন দুটোই guarded করা হলো।
-     *
-     * Write path অপরিবর্তিত: CvApprovalService ইতিমধ্যেই forceFill()
-     * ব্যবহার করে এই সব guarded field সেট করে, তাই কোনো service কোড
-     * বদলানোর দরকার নেই।
-     *
-     * ⚠️ NOTE: Worker CV auto-creation (Blueprint Section 13, UserObserver)
-     * এ Worker::create([..., 'status' => 'draft', ...]) কল করা হয় —
-     * 'status' guarded হওয়ায় এই কলও অবশ্যই forceCreate() এ বদলাতে হবে।
-     */
     protected $guarded = [
         'is_verified',
         'is_featured',
@@ -125,10 +103,6 @@ class Worker extends Model
 
     // ─── Scopes ──────────────────────────────────────────────────────
 
-    /**
-     * Only CVs allowed to appear on public pages (Step 2.5 / 2.6).
-     * NEVER include draft, pending, inactive, hired, rejected here.
-     */
     public function scopePubliclyVisible(Builder $query): Builder
     {
         return $query->whereIn('status', ['active', 'featured']);

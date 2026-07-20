@@ -17,18 +17,6 @@ class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable, HasRoles;
 
-    /**
-     * SECURITY FIX (Step 10.7 audit):
-     * আগে এই মডেলে $fillable তে role/available_balance/held_balance/
-     * email_verified_at/account_source/claimed_at ছিল এবং কোনো $guarded
-     * ছিল না — অর্থাৎ প্রতিটি field mass-assignable ছিল। এটা privilege-
-     * escalation (নিজেকে admin বানানো) এবং wallet-fraud (নিজের balance
-     * নিজে বাড়ানো) দুটোরই সরাসরি রিস্ক ছিল।
-     *
-     * এখন শুধু genuinely user-editable / registration-time ফিল্ডগুলো
-     * fillable — বাকি সব $guarded এ, শুধু forceFill()/forceCreate() দিয়ে
-     * trusted service/observer/admin-action থেকে লেখা যাবে।
-     */
     protected $fillable = [
         'name',
         'email',
@@ -40,12 +28,6 @@ class User extends Authenticatable implements FilamentUser
         'phone',
     ];
 
-    /**
-     * Admin/system-only fields — cannot be mass-assigned.
-     * Write via forceFill()->save() (Admin "Change Role"/"Adjust Wallet"
-     * actions, WalletService, UserObserver, email-verification flow,
-     * agent-account "claim" flow) ONLY.
-     */
     protected $guarded = [
         'role',
         'available_balance',
@@ -76,16 +58,6 @@ class User extends Authenticatable implements FilamentUser
 
     // ─── Filament Panel Authorization ─────────────────────────────────
 
-    /**
-     * SECURITY FIX (Step 10.7d audit — CRITICAL):
-     * This method was entirely missing. Filament's PanelProvider files
-     * only had ->authorization(...) commented out (correctly, since that
-     * method doesn't exist in Filament v5), but nothing replaced it.
-     * Without a User model implementing FilamentUser::canAccessPanel(),
-     * Filament defaults to ALLOWING every authenticated user into every
-     * panel — meaning a worker could log into /admin, or an agent into
-     * /worker, with zero role restriction. This closes that gap.
-     */
     public function canAccessPanel(Panel $panel): bool
     {
         return match ($panel->getId()) {
@@ -165,11 +137,6 @@ class User extends Authenticatable implements FilamentUser
         return (float) $this->available_balance + (float) $this->held_balance;
     }
 
-    /**
-     * True when this account was auto-created by an Agent submitting a
-     * Worker CV, and the worker has not yet claimed it (set their own
-     * email/password via the future claim flow — Phase 9/10 TODO).
-     */
     public function isAgentCreatedUnclaimed(): bool
     {
         return $this->account_source === 'agent_created' && $this->claimed_at === null;

@@ -48,12 +48,18 @@ class RegisteredUserController extends Controller
             'ref'      => ['nullable', 'string', 'max:20'],
         ]);
 
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'role'     => $request->role,
-            'password' => Hash::make($request->password),
+        $user = new User([
+            'name'  => $request->name,
+            'email' => $request->email,
         ]);
+
+        // role and account_source are guarded on the User model,
+        // so we must use forceFill to bypass mass-assignment protection.
+        $user->forceFill([
+            'password'       => Hash::make($request->password),
+            'role'           => $request->role,
+            'account_source' => 'self_registered',
+        ])->save();
 
         // Referral: form এ hidden input থেকে (POST body), না থাকলে session
         // fallback থেকে (GET /register?ref= করে সরাসরি submit বাটনে ক্লিক করলে)।

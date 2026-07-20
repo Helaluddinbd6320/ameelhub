@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -48,21 +49,27 @@ class SocialAuthController extends Controller
         if (! $user && $email) {
             $user = User::where('email', $email)->first();
             if ($user) {
-                $user->update([$column => $socialId]);
+                // update guarded columns securely
+                $user->forceFill([$column => $socialId])->save();
             }
         }
 
         // 3. Create new user (default role = worker)
         if (! $user) {
-            $user = User::create([
-                'name'             => $name,
-                'email'            => $email ?? $socialId . '@social.placeholder',
-                'password'         => bcrypt(Str::random(32)),
-                'role'             => 'worker', // default role for social signup
-                $column            => $socialId,
-                'avatar'           => $avatar,
-                'email_verified_at'=> now(), // social = already verified
+            $user = new User([
+                'name'   => $name,
+                'email'  => $email ?? $socialId . '@social.placeholder',
+                'avatar' => $avatar,
             ]);
+
+            // role, account_source, social_id & email_verified_at are guarded, so forceFill is required
+            $user->forceFill([
+                'password'          => bcrypt(Str::random(32)),
+                'role'              => 'worker', // Default role for social signup
+                'account_source'    => 'self_registered',
+                $column             => $socialId,
+                'email_verified_at' => now(), // Social = already verified
+            ])->save();
         }
 
         Auth::login($user, remember: true);
