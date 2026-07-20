@@ -19,7 +19,7 @@ class WorkerTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with('workerUser'))
+            ->modifyQueryUsing(fn($query) => $query->with('workerUser'))
             ->recordUrl(null)      // 👈 রো ক্লিক করলে আর কোনো পেজে navigate করবে না
             ->recordAction(null)   // 👈 রো/কলামে ক্লিক করলে ডিফল্ট অ্যাকশন (EditAction) আর ট্রিগার হবে না
             ->columns([
@@ -28,8 +28,15 @@ class WorkerTable
                     ->label('ছবি')
                     ->disk('public')
                     ->circular()
-                    ->defaultImageUrl(fn () => asset('images/default-avatar.png'))
+                    ->defaultImageUrl(fn() => asset('images/default-avatar.png'))
                     ->size(48),
+
+
+                TextColumn::make('full_name_bn')
+                    ->label('নাম')
+                    ->searchable(['full_name_bn', 'full_name_en'])
+                    ->sortable()
+                    ->description(fn(Worker $r) => $r->full_name_en),
 
                 TextColumn::make('wallet_balance')
                     ->label('ব্যালেন্স')
@@ -39,10 +46,10 @@ class WorkerTable
                         }
                         return $record->workerUser->totalBalance();
                     })
-                    ->formatStateUsing(fn ($state) => $state === null
+                    ->formatStateUsing(fn($state) => $state === null
                         ? '—'
                         : number_format($state, 2) . ' SAR')
-                    ->color(fn ($state) => $state === null
+                    ->color(fn($state) => $state === null
                         ? 'gray'
                         : ($state > 0 ? 'success' : 'gray'))
                     ->weight('semibold')
@@ -57,11 +64,6 @@ class WorkerTable
                         );
                     }),
 
-                TextColumn::make('full_name_bn')
-                    ->label('নাম')
-                    ->searchable(['full_name_bn', 'full_name_en'])
-                    ->sortable()
-                    ->description(fn (Worker $r) => $r->full_name_en),
 
                 TextColumn::make('skillCategory.name_bn')
                     ->label('পেশা')
@@ -72,7 +74,7 @@ class WorkerTable
                 TextColumn::make('status')
                     ->label('স্ট্যাটাস')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'draft'    => 'gray',
                         'pending'  => 'warning',
                         'active'   => 'success',
@@ -113,7 +115,7 @@ class WorkerTable
                     ->label('Featured মেয়াদ')
                     ->date('d M Y')
                     ->placeholder('—')
-                    ->color(fn (Worker $r) => $r->featured_until && $r->featured_until->isPast() ? 'danger' : 'success')
+                    ->color(fn(Worker $r) => $r->featured_until && $r->featured_until->isPast() ? 'danger' : 'success')
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('view_count')
@@ -172,12 +174,12 @@ class WorkerTable
                     ->label('অনুমোদন')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Worker $r) => $r->status === 'pending')
+                    ->visible(fn(Worker $r) => $r->status === 'pending')
                     ->requiresConfirmation()
                     ->modalHeading('CV অনুমোদন করুন')
                     ->modalDescription('এই Worker এর CV অনুমোদন করবেন?')
                     ->modalSubmitActionLabel('হ্যাঁ, অনুমোদন করুন')
-                    ->action(fn (Worker $r) => app(CvApprovalService::class)
+                    ->action(fn(Worker $r) => app(CvApprovalService::class)
                         ->approve($r, auth()->user())),
 
                 // ── REJECT ──
@@ -185,7 +187,7 @@ class WorkerTable
                     ->label('বাতিল')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (Worker $r) => $r->status === 'pending')
+                    ->visible(fn(Worker $r) => $r->status === 'pending')
                     ->form([
                         FormTextarea::make('rejection_reason')
                             ->label('বাতিলের কারণ (Worker দেখতে পাবে)')
@@ -203,7 +205,7 @@ class WorkerTable
                     ->label('Feature করুন')
                     ->icon('heroicon-o-star')
                     ->color('warning')
-                    ->visible(fn (Worker $r) => $r->status === 'active' && ! $r->is_featured)
+                    ->visible(fn(Worker $r) => $r->status === 'active' && ! $r->is_featured)
                     ->form([
                         FormDatePicker::make('featured_until')
                             ->label('কতদিন Featured থাকবে?')
@@ -224,7 +226,7 @@ class WorkerTable
                     ->label('Unfeature করুন')
                     ->icon('heroicon-o-star')
                     ->color('gray')
-                    ->visible(fn (Worker $r) => $r->is_featured)
+                    ->visible(fn(Worker $r) => $r->is_featured)
                     ->requiresConfirmation()
                     ->modalHeading('Featured বাতিল করুন')
                     ->modalDescription('এই CV আর Featured থাকবে না, Status Active এ ফিরে যাবে।')
@@ -242,11 +244,11 @@ class WorkerTable
                     ->label('Deactivate')
                     ->icon('heroicon-o-pause-circle')
                     ->color('gray')
-                    ->visible(fn (Worker $r) => in_array($r->status, ['active', 'featured']))
+                    ->visible(fn(Worker $r) => in_array($r->status, ['active', 'featured']))
                     ->requiresConfirmation()
                     ->modalHeading('Deactivate করুন')
                     ->modalDescription('এই Worker এর CV inactive করবেন?')
-                    ->action(fn (Worker $r) => $r->forceFill(['status' => 'inactive'])->save()),
+                    ->action(fn(Worker $r) => $r->forceFill(['status' => 'inactive'])->save()),
 
             ])
             ->defaultSort('created_at', 'desc')
