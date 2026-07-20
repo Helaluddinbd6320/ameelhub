@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@plugin "@tailwindcss/forms";
+
+@theme {
+    --font-sans: 'Figtree', ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../resources/views/**/*.blade.php";
+@source "../../resources/**/*.js";
