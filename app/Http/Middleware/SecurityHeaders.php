@@ -44,6 +44,8 @@ class SecurityHeaders
             implode('; ', [
                 "default-src 'self'",
                 "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://www.googletagmanager.com",
+                "worker-src 'self' blob:",   // 👈 এই লাইনটা নতুন যোগ করুন
+
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
                 "font-src 'self' https://fonts.gstatic.com",
                 "img-src 'self' data: https: blob:",
