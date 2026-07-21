@@ -17,6 +17,9 @@ class JobPostTable
     public static function configure(Table $table): Table
     {
         return $table
+            // PERFORMANCE FIX (Step 10.8): eager-load skillCategory + postedBy to
+            // avoid N+1 queries — both are rendered per-row below.
+            ->modifyQueryUsing(fn ($query) => $query->with(['skillCategory', 'postedBy']))
             ->columns([
 
                 TextColumn::make('job_title')

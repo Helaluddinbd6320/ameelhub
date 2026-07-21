@@ -17,6 +17,10 @@ class RechargeRequestsTable
     public static function configure(Table $table): Table
     {
         return $table
+            // PERFORMANCE FIX (Step 10.8): eager-load user + processedBy to avoid
+            // N+1 queries — user.name/email and processedBy.name are rendered
+            // per-row below, so without this every row triggers 2 extra queries.
+            ->modifyQueryUsing(fn ($query) => $query->with(['user', 'processedBy']))
             ->columns([
                 TextColumn::make('id')
                     ->label('#')
