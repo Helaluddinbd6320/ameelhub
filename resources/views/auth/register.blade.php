@@ -64,14 +64,26 @@
         </div>
 
         <!-- Role Selection -->
-        <div>
-            <label class="block text-xs font-medium text-white/70 mb-1.5">আমি কে? / I am a</label>
+        <div class="relative" id="role-select-wrapper">
+            <div class="flex items-center gap-1.5 mb-1.5">
+                <label class="block text-xs font-medium text-white/70">আমি কে? / I am a <span style="color:#f3a4a4;">*</span></label>
+
+                {{-- Bouncing hint — শুধু তখনই দেখা যাবে যখন কেউ role না বেছে
+                     Google/Facebook বাটনে ক্লিক করার চেষ্টা করবে --}}
+                <span id="role-hint-arrow"
+                      class="hidden items-center gap-1 text-xs font-semibold animate-bounce"
+                      style="color:#C9974C;">
+                    ← এখানে বেছে নিন
+                </span>
+            </div>
+
             <div class="flex gap-3">
                 {{-- Worker Card --}}
                 <label id="label-worker" class="flex-1 flex items-center gap-2 cursor-pointer rounded-2xl border px-3.5 py-3 transition-all"
-                       style="{{ old('role', 'worker') === 'worker' ? 'border-color:#C9974C; background-color:rgba(201,151,76,0.12);' : 'border-color:rgba(255,255,255,0.2); background-color:rgba(255,255,255,0.04);' }}">
+                       style="{{ old('role') === 'worker' ? 'border-color:#C9974C; background-color:rgba(201,151,76,0.12);' : 'border-color:rgba(255,255,255,0.2); background-color:rgba(255,255,255,0.04);' }}">
                     <input type="radio" name="role" value="worker" id="role-worker"
-                        {{ old('role', 'worker') === 'worker' ? 'checked' : '' }}
+                        {{ old('role') === 'worker' ? 'checked' : '' }}
+                        required
                         style="accent-color:#C9974C;"
                         onchange="updateRoles('worker')"/>
                     <span class="text-xs font-medium text-white">🧑‍🔧 কর্মী (Worker)</span>
@@ -82,6 +94,7 @@
                        style="{{ old('role') === 'agent' ? 'border-color:#C9974C; background-color:rgba(201,151,76,0.12);' : 'border-color:rgba(255,255,255,0.2); background-color:rgba(255,255,255,0.04);' }}">
                     <input type="radio" name="role" value="agent" id="role-agent"
                         {{ old('role') === 'agent' ? 'checked' : '' }}
+                        required
                         style="accent-color:#C9974C;"
                         onchange="updateRoles('agent')"/>
                     <span class="text-xs font-medium text-white">🤝 এজেন্ট (Agent)</span>
@@ -165,6 +178,12 @@
                     (see updateRoles() below), so whichever card is selected
                     when the person clicks Google/Facebook is what actually
                     gets sent to the backend.
+
+                    Step 10.9b: role is no longer pre-selected by default —
+                    the person must consciously choose Worker/Agent before a
+                    social redirect is allowed. If they click without
+                    choosing, we block the navigation and bounce a hint arrow
+                    next to the selector instead (see click handlers below).
                 --}}
                 <a id="social-google" href="{{ route('social.redirect', 'google') }}"
                     data-base-url="{{ route('social.redirect', 'google') }}"
@@ -207,6 +226,28 @@
             });
         }
 
+        function hideRoleHint() {
+            const hint = document.getElementById('role-hint-arrow');
+            if (hint) {
+                hint.classList.add('hidden');
+                hint.classList.remove('flex');
+            }
+        }
+
+        function showRoleHint() {
+            const hint = document.getElementById('role-hint-arrow');
+            if (hint) {
+                hint.classList.remove('hidden');
+                hint.classList.add('flex');
+            }
+            // role selector-এর কাছে স্ক্রল করে দেখানো, বিশেষত মোবাইলে যদি
+            // ফর্মের নিচের দিকে থাকে
+            const wrapper = document.getElementById('role-select-wrapper');
+            if (wrapper) {
+                wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
         function updateRoles(selected) {
             const workerLabel = document.getElementById('label-worker');
             const agentLabel = document.getElementById('label-agent');
@@ -224,15 +265,38 @@
             }
 
             updateSocialLinks(selected);
+            hideRoleHint(); // role বেছে নেওয়ার সাথে সাথে hint সরে যাবে
         }
 
-        // Set the initial href on page load to match whichever radio is
-        // checked by default (respects old('role') on validation-error
-        // redisplay too, since the radio 'checked' state above already
-        // reflects old('role', 'worker')).
-        document.addEventListener('DOMContentLoaded', function () {
+        function getSelectedRole() {
             const checked = document.querySelector('input[name="role"]:checked');
-            updateSocialLinks(checked ? checked.value : 'worker');
+            return checked ? checked.value : null;
+        }
+
+        // Google/Facebook বাটনে ক্লিক করার সময় role সিলেক্ট করা আছে কিনা যাচাই —
+        // না থাকলে redirect আটকে দিয়ে bouncing hint দেখানো হবে।
+        function handleSocialClick(event) {
+            const role = getSelectedRole();
+            if (! role) {
+                event.preventDefault();
+                showRoleHint();
+                return false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const googleLink = document.getElementById('social-google');
+            const facebookLink = document.getElementById('social-facebook');
+
+            if (googleLink) googleLink.addEventListener('click', handleSocialClick);
+            if (facebookLink) facebookLink.addEventListener('click', handleSocialClick);
+
+            // validation error-এর পর ফিরে এলে (old('role') সেট থাকলে) href
+            // আগে থেকেই ঠিকভাবে সেট করে দেওয়া
+            const initialRole = getSelectedRole();
+            if (initialRole) {
+                updateSocialLinks(initialRole);
+            }
         });
     </script>
 </x-guest-layout>
