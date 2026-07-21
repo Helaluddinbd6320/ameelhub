@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -74,6 +73,18 @@ class SocialAuthController extends Controller
 
         Auth::login($user, remember: true);
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        // BUG FIX (production log, Step 10.9 audit): RouteServiceProvider::HOME
+        // was used here, but Laravel 11+/12's slim bootstrap structure removed
+        // App\Providers\RouteServiceProvider entirely — every social login
+        // attempt was throwing "Class ... not found" (production.ERROR log,
+        // 2026-07-21). Since AmeelHub has three separate panels (admin/agent/
+        // worker) rather than one single "home", redirect by role instead of
+        // a single HOME constant — same role-based approach used in
+        // User::canAccessPanel().
+        return redirect()->intended(match ($user->role) {
+            'super_admin', 'admin', 'staff' => '/admin',
+            'agent' => '/agent',
+            default => '/worker',
+        });
     }
 }
