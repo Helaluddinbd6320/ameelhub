@@ -4,7 +4,8 @@ namespace App\Providers\Filament;
 
 use App\Http\Middleware\SanitizeInput;
 use App\Http\Middleware\SetLocale;
-use Filament\Http\Middleware\Authenticate;
+// use Filament\Http\Middleware\Authenticate;
+use App\Http\Middleware\RedirectToCentralLogin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -28,14 +29,14 @@ class AgentPanelProvider extends PanelProvider
             ->id('agent')
             ->renderHook(
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
-                fn (): string => Blade::render('@livewire(\'notification-bell\')'),
+                fn(): string => Blade::render('@livewire(\'notification-bell\')'),
             )
             ->path('agent')
             ->login()
             ->authGuard('web')
             ->registration(false)
 
-// ->authorization(fn () => auth()->user()?->hasRole('agent') ?? false)
+            // ->authorization(fn () => auth()->user()?->hasRole('agent') ?? false)
             ->colors([
                 'primary' => Color::Emerald,
             ])
@@ -59,7 +60,8 @@ class AgentPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class,
+                // Authenticate::class,
+                RedirectToCentralLogin::class,
             ]);
     }
 }

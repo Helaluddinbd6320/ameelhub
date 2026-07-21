@@ -4,7 +4,8 @@ namespace App\Providers\Filament;
 
 use App\Http\Middleware\SanitizeInput;
 use App\Http\Middleware\SetLocale;
-use Filament\Http\Middleware\Authenticate;
+// use Filament\Http\Middleware\Authenticate;
+use App\Http\Middleware\RedirectToCentralLogin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -59,7 +60,8 @@ class WorkerPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class,
+                // Authenticate::class,
+                RedirectToCentralLogin::class,
             ]);
     }
 }
