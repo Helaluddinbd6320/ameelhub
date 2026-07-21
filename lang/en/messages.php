@@ -59,6 +59,7 @@ return [
             'job_deal' => 'Deals',
             'worker' => 'Workers',
             'job_post' => 'Job Posts',
+            'recharge_request' => 'Recharge Request',
             'withdrawal_request' => 'Withdrawal Requests',
             'agent_verification' => 'Agent Verification',
             'analytics' => 'Analytics',

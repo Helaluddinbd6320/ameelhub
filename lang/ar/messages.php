@@ -58,6 +58,7 @@ return [
             'job_deal' => 'الصفقات',
             'worker' => 'العمال',
             'job_post' => 'الوظائف المنشورة',
+            'recharge_request' => 'طلب إعادة الشحن',
             'withdrawal_request' => 'طلبات السحب',
             'agent_verification' => 'التحقق من الوكلاء',
             'analytics' => 'التحليلات',

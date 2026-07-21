@@ -58,6 +58,7 @@ return [
             'job_deal' => 'ডিল সমূহ',
             'worker' => 'কর্মীরা',
             'job_post' => 'জব পোস্ট সমূহ',
+            'recharge_request' => 'রিচার্জ রিকোয়েস্ট',
             'withdrawal_request' => 'উত্তোলনের অনুরোধ',
             'agent_verification' => 'এজেন্ট ভেরিফিকেশন',
             'analytics' => 'অ্যানালিটিক্স',
