@@ -154,7 +154,20 @@
                 </div>
             </div>
             <div class="mt-4 flex flex-col gap-2.5">
-                <a href="{{ route('social.redirect', 'google') }}"
+                {{--
+                    BUG FIX (Step 10.9 audit — Helal-reported): these two links
+                    used to point straight at route('social.redirect', ...)
+                    with no role info at all, so SocialAuthController always
+                    hardcoded new social signups as 'worker' — the radio
+                    selection above was silently ignored. We now keep the
+                    base URL in a data attribute and append "?role=worker" or
+                    "?role=agent" via JS, kept in sync with the radio buttons
+                    (see updateRoles() below), so whichever card is selected
+                    when the person clicks Google/Facebook is what actually
+                    gets sent to the backend.
+                --}}
+                <a id="social-google" href="{{ route('social.redirect', 'google') }}"
+                    data-base-url="{{ route('social.redirect', 'google') }}"
                     class="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-2xl text-sm font-medium transition-colors"
                     style="background-color:rgba(255,255,255,0.92); color:#374151;">
                     <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -165,7 +178,8 @@
                     </svg>
                     Google দিয়ে রেজিস্ট্রেশন
                 </a>
-                <a href="{{ route('social.redirect', 'facebook') }}"
+                <a id="social-facebook" href="{{ route('social.redirect', 'facebook') }}"
+                    data-base-url="{{ route('social.redirect', 'facebook') }}"
                     class="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-2xl text-sm font-medium transition-colors"
                     style="background-color:rgba(255,255,255,0.92); color:#374151;">
                     <svg class="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
@@ -182,8 +196,17 @@
         </p>
     </form>
 
-    {{-- Script for Radio Button Background Styling --}}
+    {{-- Script for Radio Button Background Styling + Social Link role sync --}}
     <script>
+        function updateSocialLinks(role) {
+            ['social-google', 'social-facebook'].forEach(function (id) {
+                const link = document.getElementById(id);
+                if (!link) return;
+                const base = link.getAttribute('data-base-url');
+                link.setAttribute('href', base + '?role=' + encodeURIComponent(role));
+            });
+        }
+
         function updateRoles(selected) {
             const workerLabel = document.getElementById('label-worker');
             const agentLabel = document.getElementById('label-agent');
@@ -199,6 +222,17 @@
                 workerLabel.style.borderColor = 'rgba(255,255,255,0.2)';
                 workerLabel.style.backgroundColor = 'rgba(255,255,255,0.04)';
             }
+
+            updateSocialLinks(selected);
         }
+
+        // Set the initial href on page load to match whichever radio is
+        // checked by default (respects old('role') on validation-error
+        // redisplay too, since the radio 'checked' state above already
+        // reflects old('role', 'worker')).
+        document.addEventListener('DOMContentLoaded', function () {
+            const checked = document.querySelector('input[name="role"]:checked');
+            updateSocialLinks(checked ? checked.value : 'worker');
+        });
     </script>
 </x-guest-layout>

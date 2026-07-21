@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
@@ -13,10 +14,34 @@ class SocialAuthController extends Controller
 {
     protected array $allowedProviders = ['google', 'facebook'];
 
-    public function redirect(string $provider): RedirectResponse
+    // Only these two roles are selectable at public registration
+    // (agent/worker) — admin/staff/super_admin are never created this way.
+    protected array $allowedSignupRoles = ['worker', 'agent'];
+
+    public function redirect(string $provider, Request $request): RedirectResponse
     {
         if (! in_array($provider, $this->allowedProviders)) {
             abort(404);
+        }
+
+        // BUG FIX (Step 10.9 audit — Helal-reported): the registration page's
+        // "আমি কে? / I am a" Worker/Agent selector was being completely lost
+        // for social signups — the Google/Facebook buttons are plain links,
+        // not tied to the radio state, and OAuth redirects away from our app
+        // entirely, so nothing survived the round-trip to callback(). New
+        // social users always ended up hardcoded as 'worker' regardless of
+        // what was selected.
+        //
+        // Fix: read an optional ?role= query param (the registration view
+        // must append it, e.g. /auth/google/redirect?role=agent) and stash
+        // it in the session before leaving for the OAuth provider. Session
+        // survives the redirect round-trip, callback() reads it back.
+        $role = $request->query('role');
+
+        if (in_array($role, $this->allowedSignupRoles, true)) {
+            session(['social_signup_role' => $role]);
+        } else {
+            session()->forget('social_signup_role');
         }
 
         return Socialite::driver($provider)->redirect();
@@ -41,6 +66,15 @@ class SocialAuthController extends Controller
         $name      = $socialUser->getName() ?? $socialUser->getNickname() ?? 'User';
         $avatar    = $socialUser->getAvatar();
 
+        // Pull the role stashed in redirect() above. Default to 'worker' if
+        // it's missing/invalid (e.g. someone hits the callback URL directly
+        // without going through redirect() first) — never trust unvalidated
+        // input for a security-relevant field like role.
+        $signupRole = session()->pull('social_signup_role');
+        if (! in_array($signupRole, $this->allowedSignupRoles, true)) {
+            $signupRole = 'worker';
+        }
+
         // 1. Find by social ID
         $user = User::where($column, $socialId)->first();
 
@@ -53,7 +87,8 @@ class SocialAuthController extends Controller
             }
         }
 
-        // 3. Create new user (default role = worker)
+        // 3. Create new user (role = whatever was selected on the
+        // registration form, worker or agent — see $signupRole above)
         if (! $user) {
             $user = new User([
                 'name'   => $name,
@@ -64,7 +99,7 @@ class SocialAuthController extends Controller
             // role, account_source, social_id & email_verified_at are guarded, so forceFill is required
             $user->forceFill([
                 'password'          => bcrypt(Str::random(32)),
-                'role'              => 'worker', // Default role for social signup
+                'role'              => $signupRole,
                 'account_source'    => 'self_registered',
                 $column             => $socialId,
                 'email_verified_at' => now(), // Social = already verified
