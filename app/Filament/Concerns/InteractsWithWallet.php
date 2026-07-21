@@ -3,17 +3,22 @@
 namespace App\Filament\Concerns;
 
 use App\Exceptions\WalletException;
+use App\Models\RechargeRequest;
 use App\Models\WalletTransaction;
 use App\Models\WithdrawalRequest;
+use App\Services\RechargeService;
 use App\Services\WalletService;
 use App\Services\WithdrawalService;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 trait InteractsWithWallet
 {
     use WithPagination;
+    use WithFileUploads;
 
     // ─── Withdrawal Modal State ──────────────────────────────────────
 
@@ -22,6 +27,16 @@ trait InteractsWithWallet
     public ?string $amount = null;
     public ?string $paymentMethod = null;
     public ?string $accountDetails = null;
+
+    // ─── Recharge Modal State ─────────────────────────────────────────
+
+    public bool $isRecharging = false;
+
+    public ?string $rechargeAmount = null;
+    public ?string $rechargePaymentMethod = null;
+    public ?string $referenceNumber = null;
+    /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile|null */
+    public $proofFile = null;
 
     // ─── Filter State ──────────────────────────────────────────────────
 
@@ -43,6 +58,32 @@ trait InteractsWithWallet
             'amount.numeric'          => 'পরিমাণ অবশ্যই সংখ্যা হতে হবে।',
             'paymentMethod.required'  => 'একটি মাধ্যম নির্বাচন করুন।',
             'accountDetails.required' => 'অ্যাকাউন্ট নম্বর/ঠিকানা লিখুন।',
+        ];
+    }
+
+    protected function rechargeRules(): array
+    {
+        return [
+            'rechargeAmount'         => ['required', 'numeric', 'min:1'],
+            'rechargePaymentMethod'  => ['required', 'in:bank,bkash,nagad,stcpay,cash'],
+            // অন্তত একটা থাকতেই হবে — রেফারেন্স নম্বর অথবা প্রুফ স্ক্রিনশট।
+            // দুটোই না থাকলে Admin ম্যানুয়ালি ব্যাংক/বিকাশ স্টেটমেন্টে
+            // মিলিয়ে verify করতে পারবেন না।
+            'referenceNumber'        => ['nullable', 'required_without:proofFile', 'string', 'max:100'],
+            'proofFile'              => ['nullable', 'required_without:referenceNumber', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+        ];
+    }
+
+    protected function rechargeMessages(): array
+    {
+        return [
+            'rechargeAmount.required'          => 'পরিমাণ লিখুন।',
+            'rechargeAmount.numeric'           => 'পরিমাণ অবশ্যই সংখ্যা হতে হবে।',
+            'rechargePaymentMethod.required'   => 'একটি মাধ্যম নির্বাচন করুন।',
+            'referenceNumber.required_without' => 'রেফারেন্স নম্বর অথবা প্রুফ স্ক্রিনশট — অন্তত একটা দিন।',
+            'proofFile.required_without'       => 'প্রুফ স্ক্রিনশট অথবা রেফারেন্স নম্বর — অন্তত একটা দিন।',
+            'proofFile.mimes'                  => 'শুধু JPG, PNG অথবা PDF ফাইল দেওয়া যাবে।',
+            'proofFile.max'                    => 'ফাইলের আকার সর্বোচ্চ 5MB হতে হবে।',
         ];
     }
 
@@ -73,6 +114,24 @@ trait InteractsWithWallet
     public function getTodayWithdrawalCountProperty(): int
     {
         return WithdrawalRequest::query()
+            ->where('user_id', Auth::id())
+            ->whereDate('created_at', today())
+            ->count();
+    }
+
+    public function getMinRechargeProperty(): float
+    {
+        return (float) setting('min_recharge_sar', 10);
+    }
+
+    public function getRechargeDailyLimitProperty(): int
+    {
+        return (int) setting('recharge_daily_limit', 5);
+    }
+
+    public function getTodayRechargeCountProperty(): int
+    {
+        return RechargeRequest::query()
             ->where('user_id', Auth::id())
             ->whereDate('created_at', today())
             ->count();
@@ -118,7 +177,7 @@ trait InteractsWithWallet
         ];
     }
 
-    // ─── Modal Controls ───────────────────────────────────────────────
+    // ─── Withdrawal Modal Controls ────────────────────────────────────
 
     public function openWithdrawModal(): void
     {
@@ -134,7 +193,23 @@ trait InteractsWithWallet
         $this->resetErrorBag();
     }
 
-    // ─── Submit ────────────────────────────────────────────────────────
+    // ─── Recharge Modal Controls ──────────────────────────────────────
+
+    public function openRechargeModal(): void
+    {
+        $this->reset(['rechargeAmount', 'rechargePaymentMethod', 'referenceNumber', 'proofFile']);
+        $this->resetErrorBag();
+        $this->isRecharging = true;
+    }
+
+    public function closeRechargeModal(): void
+    {
+        $this->isRecharging = false;
+        $this->reset(['rechargeAmount', 'rechargePaymentMethod', 'referenceNumber', 'proofFile']);
+        $this->resetErrorBag();
+    }
+
+    // ─── Submit: Withdrawal ────────────────────────────────────────────
 
     public function submitWithdrawal(WithdrawalService $service): void
     {
@@ -163,6 +238,56 @@ trait InteractsWithWallet
                 ->send();
 
             $this->addError('amount', $e->getMessage());
+        }
+    }
+
+    // ─── Submit: Recharge ──────────────────────────────────────────────
+
+    public function submitRecharge(RechargeService $service): void
+    {
+        $validated = $this->validate($this->rechargeRules(), $this->rechargeMessages());
+
+        try {
+            $proofPath = null;
+
+            if ($this->proofFile) {
+                // L10 file upload security: ULID filename, MIME already
+                // whitelisted by validate() above, stored on the private
+                // disk (not publicly symlinked) — same pattern as agent
+                // verification documents.
+                $ulid = (string) Str::ulid();
+                $extension = $this->proofFile->getClientOriginalExtension();
+
+                $proofPath = $this->proofFile->storeAs(
+                    'recharge-proofs',
+                    "{$ulid}.{$extension}",
+                    'private_docs'
+                );
+            }
+
+            $service->request(
+                Auth::user(),
+                (float) $validated['rechargeAmount'],
+                $validated['rechargePaymentMethod'],
+                $validated['referenceNumber'] ?? null,
+                $proofPath
+            );
+
+            Notification::make()
+                ->title('Recharge request পাঠানো হয়েছে')
+                ->body('আপনার অনুরোধ Admin যাচাই করে অনুমোদন দেবেন।')
+                ->success()
+                ->send();
+
+            $this->closeRechargeModal();
+        } catch (\Throwable $e) {
+            Notification::make()
+                ->title('অনুরোধ ব্যর্থ হয়েছে')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+
+            $this->addError('rechargeAmount', $e->getMessage());
         }
     }
 
@@ -208,6 +333,26 @@ trait InteractsWithWallet
     public function updatedAccountDetails(): void
     {
         $this->resetErrorBag('accountDetails');
+    }
+
+    public function updatedRechargeAmount(): void
+    {
+        $this->resetErrorBag('rechargeAmount');
+    }
+
+    public function updatedRechargePaymentMethod(): void
+    {
+        $this->resetErrorBag('rechargePaymentMethod');
+    }
+
+    public function updatedReferenceNumber(): void
+    {
+        $this->resetErrorBag(['referenceNumber', 'proofFile']);
+    }
+
+    public function updatedProofFile(): void
+    {
+        $this->resetErrorBag(['proofFile', 'referenceNumber']);
     }
 
     /** ফিল্টার বদলালে pagination প্রথম পেজে রিসেট হবে */
