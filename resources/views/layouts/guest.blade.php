@@ -20,12 +20,7 @@
                 <div class="flex">
                     <div class="shrink-0 flex items-center gap-2">
                         <a href="{{ url('/') }}" class="flex items-center gap-2">
-                            <div class="flex h-8 w-8 items-center justify-center rounded-full" style="background-color:#C9974C;">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" style="color:#0B4F3F;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
-                                    <path d="M12 2 4 5v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V5l-8-3Z" stroke-linejoin="round"/>
-                                    <path d="m9 12 2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
+                            <img src="{{ asset('images/logo.png') }}" alt="AmeelHub" class="h-8 w-auto">
                             <span class="font-bold text-gray-900" style="font-family: 'Noto Serif Bengali', serif;">AmeelHub</span>
                         </a>
                     </div>
