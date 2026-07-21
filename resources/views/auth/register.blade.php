@@ -71,9 +71,9 @@
                 {{-- Bouncing hint — শুধু তখনই দেখা যাবে যখন কেউ role না বেছে
                      Google/Facebook বাটনে ক্লিক করার চেষ্টা করবে --}}
                 <span id="role-hint-arrow"
-                      class="hidden items-center gap-1 text-xs font-semibold animate-bounce"
-                      style="color:#C9974C;">
-                    ← এখানে বেছে নিন
+                      class="hidden items-center gap-1 text-xs font-semibold"
+                      style="color:#C9974C; animation: bounce-horizontal 0.8s ease-in-out infinite;">
+                    👈 এখানে বেছে নিন
                 </span>
             </div>
 
@@ -214,6 +214,19 @@
             ইতিমধ্যেই রেজিস্টার্ড? <a href="{{ route('login') }}" class="font-semibold hover:underline" style="color:#C9974C;">লগইন করুন</a>
         </p>
     </form>
+
+    {{-- Custom horizontal-bounce animation — Tailwind-এর animate-bounce
+         উপর-নিচে বাউন্স করে, এটা role-hint arrow-র জন্য ডানে-বামে বাউন্স করে --}}
+    <style>
+        @keyframes bounce-horizontal {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            50% {
+                transform: translateX(-6px);
+            }
+        }
+    </style>
 
     {{-- Script for Radio Button Background Styling + Social Link role sync --}}
     <script>
