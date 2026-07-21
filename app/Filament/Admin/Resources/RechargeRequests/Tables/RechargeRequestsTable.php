@@ -94,25 +94,34 @@ class RechargeRequestsTable
                     ]),
             ])
             ->recordActions([
-                // SECURITY (consistent with 10.7d AgentVerificationTable fix):
-                // Proof file is on the private_docs disk, not publicly
-                // symlinked. Only super_admin/admin may view/download it —
-                // ->visible() (UI) + abort_unless() (defense-in-depth).
+                // FIX (500 error, post-launch bug): Storage::disk('private_docs')
+                // ->temporaryUrl() is NOT supported by Laravel's 'local' filesystem
+                // driver — it throws a RuntimeException the moment a row with a
+                // proof_file renders, since temporaryUrl() only works on cloud
+                // disks (S3 etc.) that support signed URLs natively.
+                //
+                // Fixed by streaming the file directly through a Livewire/Filament
+                // action response (works fine with the local driver, no signed-URL
+                // support needed) instead of trying to generate a URL for ->url().
                 Action::make('view_proof')
                     ->label('প্রুফ দেখুন')
                     ->icon('heroicon-o-photo')
                     ->color('gray')
                     ->visible(fn ($record) => filled($record->proof_file)
                         && auth()->user()->hasAnyRole(['super_admin', 'admin']))
-                    ->url(fn ($record) => filled($record->proof_file)
-                        ? Storage::disk('private_docs')->temporaryUrl(
-                            $record->proof_file,
-                            now()->addMinutes(5)
-                        )
-                        : null)
-                    ->openUrlInNewTab()
                     ->action(function ($record) {
                         abort_unless(auth()->user()->hasAnyRole(['super_admin', 'admin']), 403);
+                        abort_unless(
+                            Storage::disk('private_docs')->exists($record->proof_file),
+                            404
+                        );
+
+                        return response()->streamDownload(
+                            function () use ($record) {
+                                echo Storage::disk('private_docs')->get($record->proof_file);
+                            },
+                            basename($record->proof_file)
+                        );
                     }),
 
                 Action::make('approve')
