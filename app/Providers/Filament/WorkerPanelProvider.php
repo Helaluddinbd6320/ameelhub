@@ -11,6 +11,7 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -29,14 +30,20 @@ class WorkerPanelProvider extends PanelProvider
             ->id('worker')
             ->renderHook(
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
-                fn (): string => Blade::render('@livewire(\'notification-bell\')'),
+                fn(): string => Blade::render('@livewire(\'notification-bell\')'),
             )
             ->path('worker')
             ->login()
             ->authGuard('web')
             ->registration(false)
+            ->userMenuItems([
+                'logout' => MenuItem::make()
+                    ->label('লগ আউট')
+                    ->icon('heroicon-o-arrow-left-on-rectangle')
+                    ->url(fn() => route('panel.logout')),
+            ])
 
-// ->authorization(fn () => auth()->user()?->hasRole('worker') ?? false)
+            // ->authorization(fn () => auth()->user()?->hasRole('worker') ?? false)
             ->colors([
                 'primary' => Color::Orange,
             ])

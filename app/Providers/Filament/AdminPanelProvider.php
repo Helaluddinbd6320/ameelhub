@@ -11,6 +11,7 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
+use Filament\Navigation\MenuItem;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -37,6 +38,12 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->authGuard('web')
             ->registration(false)
+            ->userMenuItems([
+                'logout' => MenuItem::make()
+                    ->label('লগ আউট')
+                    ->icon('heroicon-o-arrow-left-on-rectangle')
+                    ->url(fn() => route('panel.logout')),
+            ])
             ->colors([
                 'primary' => Color::Blue,
             ])
