@@ -21,6 +21,9 @@ class MyWorkersTable
     public static function configure(Table $table): Table
     {
         return $table
+            // PERFORMANCE FIX (Step 10.8): eager-load skillCategory to avoid
+            // N+1 queries — skillCategory.name_en is rendered per-row below.
+            ->modifyQueryUsing(fn ($query) => $query->with('skillCategory'))
             ->columns([
                 ImageColumn::make('photo')
                     ->label('ছবি')

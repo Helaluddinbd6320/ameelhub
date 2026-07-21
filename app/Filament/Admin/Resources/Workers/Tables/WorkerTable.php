@@ -19,7 +19,10 @@ class WorkerTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn($query) => $query->with('workerUser'))
+            // PERFORMANCE FIX (Step 10.8): added skillCategory alongside the
+            // existing workerUser eager load — skillCategory.name_bn is
+            // rendered per-row below and was missing, causing N+1 queries.
+            ->modifyQueryUsing(fn($query) => $query->with(['workerUser', 'skillCategory']))
             ->recordUrl(null)      // 👈 রো ক্লিক করলে আর কোনো পেজে navigate করবে না
             ->recordAction(null)   // 👈 রো/কলামে ক্লিক করলে ডিফল্ট অ্যাকশন (EditAction) আর ট্রিগার হবে না
             ->columns([

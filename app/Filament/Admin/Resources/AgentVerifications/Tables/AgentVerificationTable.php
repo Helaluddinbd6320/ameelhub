@@ -17,6 +17,10 @@ class AgentVerificationTable
     {
         return $table
             ->modifyQueryUsing(fn ($query) => $query
+                // PERFORMANCE FIX (Step 10.8): added ->with('user') alongside
+                // the existing withCount/addSelect below — user.email is
+                // rendered per-row and was not eager-loaded, causing N+1.
+                ->with('user')
                 ->whereNotNull('passport_copy')
                 ->whereNotNull('nid_copy')
                 ->withCount(['dealsAsAgent as successful_deals_count' => function ($q) {
