@@ -9,6 +9,7 @@ use App\Models\JobDeal;
 use App\Models\JobDealMilestone;
 use App\Models\AgentNok;
 use App\Models\WithdrawalRequest;
+use App\Models\RechargeRequest;
 use App\Models\AppNotification;
 use App\Mail\CvStatusMail;
 use App\Mail\JobStatusMail;
@@ -19,6 +20,7 @@ use App\Mail\MilestoneMail;
 use App\Mail\DisputeMail;
 use App\Mail\DealCompletedMail;
 use App\Mail\WithdrawalMail;
+use App\Mail\RechargeMail;
 use App\Mail\IqamaExpiryDigestMail;
 use App\Mail\ReferralBonusMail;
 use App\Mail\AgentVerificationMail;
@@ -427,6 +429,42 @@ class NotificationService
 
         $this->notify($user, 'withdrawal_rejected', 'Withdrawal বাতিল হয়েছে', "কারণ: {$reason}", ['withdrawal_id' => $w->id, 'reason' => $reason]);
         $this->sendMail($user, new WithdrawalMail($w, 'rejected', $reason));
+    }
+
+    // ─────────────────────────────────────────────
+    // Recharge events
+    //
+    // EXTENSION (added post-launch — worker/agent wallet top-up flow,
+    // same shape as the Withdrawal events section above; RechargeRequest
+    // model uses 'user_id' as the FK column, same as WithdrawalRequest).
+    // ─────────────────────────────────────────────
+
+    public function rechargeRequested(RechargeRequest $r): void
+    {
+        foreach ($this->adminUsersForDb() as $admin) {
+            $this->notify($admin, 'recharge_requested', 'নতুন Recharge Request', "{$r->amount} SAR এর Recharge Request জমা পড়েছে ({$r->payment_method}), যাচাই করে অনুমোদন দিন।", ['recharge_id' => $r->id]);
+        }
+        foreach ($this->adminUsersForEmail() as $admin) {
+            $this->sendMail($admin, new RechargeMail($r, 'requested'));
+        }
+    }
+
+    public function rechargeApproved(RechargeRequest $r): void
+    {
+        $user = User::find($r->user_id);
+        if (! $user) return;
+
+        $this->notify($user, 'recharge_approved', 'Recharge অনুমোদিত হয়েছে', "{$r->amount} SAR আপনার Wallet এ যোগ হয়েছে।", ['recharge_id' => $r->id]);
+        $this->sendMail($user, new RechargeMail($r, 'approved'));
+    }
+
+    public function rechargeRejected(RechargeRequest $r, string $reason): void
+    {
+        $user = User::find($r->user_id);
+        if (! $user) return;
+
+        $this->notify($user, 'recharge_rejected', 'Recharge Request বাতিল হয়েছে', "কারণ: {$reason}", ['recharge_id' => $r->id, 'reason' => $reason]);
+        $this->sendMail($user, new RechargeMail($r, 'rejected', $reason));
     }
 
     // ─────────────────────────────────────────────

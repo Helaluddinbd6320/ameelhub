@@ -1,20 +1,20 @@
 <?php
-// app/Mail/WithdrawalMail.php
+// app/Mail/RechargeMail.php
 namespace App\Mail;
 
-use App\Models\WithdrawalRequest;
+use App\Models\RechargeRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class WithdrawalMail extends Mailable
+class RechargeMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public function __construct(
-        public WithdrawalRequest $withdrawal,
+        public RechargeRequest $recharge,
         public string $status, // requested|approved|rejected
         public ?string $reason = null,
     ) {}
@@ -22,15 +22,15 @@ class WithdrawalMail extends Mailable
     public function envelope(): Envelope
     {
         $subjects = [
-            'requested' => 'নতুন Withdrawal Request — AmeelHub',
-            'approved'  => 'আপনার Withdrawal অনুমোদিত হয়েছে — AmeelHub',
-            'rejected'  => 'আপনার Withdrawal বাতিল হয়েছে — AmeelHub',
+            'requested' => 'নতুন Recharge Request — AmeelHub',
+            'approved'  => 'আপনার Recharge অনুমোদিত হয়েছে — AmeelHub',
+            'rejected'  => 'আপনার Recharge Request বাতিল হয়েছে — AmeelHub',
         ];
         return new Envelope(subject: $subjects[$this->status]);
     }
 
     public function content(): Content
     {
-        return new Content(markdown: 'mail.withdrawal');
+        return new Content(markdown: 'mail.recharge');
     }
 }
