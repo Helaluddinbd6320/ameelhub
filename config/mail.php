@@ -115,4 +115,30 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Markdown Mail Settings
+    |--------------------------------------------------------------------------
+    |
+    | BUG FIX (Step 10.9 audit — production log, "No hint path defined for
+    | [mail]"): this key was missing entirely from config/mail.php, so the
+    | 'mail::' view namespace (used by resources/views/mail/recharge.blade.php
+    | via @component('mail::message')) could never resolve, even after the
+    | vendor mail views were published to resources/views/vendor/mail.
+    |
+    | If you customize the paths option, you may generate the views using
+    | the `mail:make` Artisan command. You can update the color options
+    | as you please as it will change the color scheme of every message
+    | that is rendered by Laravel and is used for the buttons and links.
+    |
+    */
+
+    'markdown' => [
+        'theme' => 'default',
+
+        'paths' => [
+            resource_path('views/vendor/mail'),
+        ],
+    ],
+
 ];
