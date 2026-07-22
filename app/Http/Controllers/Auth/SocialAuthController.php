@@ -24,18 +24,10 @@ class SocialAuthController extends Controller
             abort(404);
         }
 
-        // BUG FIX (Step 10.9 audit — Helal-reported): the registration page's
-        // "আমি কে? / I am a" Worker/Agent selector was being completely lost
-        // for social signups — the Google/Facebook buttons are plain links,
-        // not tied to the radio state, and OAuth redirects away from our app
-        // entirely, so nothing survived the round-trip to callback(). New
-        // social users always ended up hardcoded as 'worker' regardless of
-        // what was selected.
-        //
-        // Fix: read an optional ?role= query param (the registration view
-        // must append it, e.g. /auth/google/redirect?role=agent) and stash
-        // it in the session before leaving for the OAuth provider. Session
-        // survives the redirect round-trip, callback() reads it back.
+        // The registration page's "আমি কে? / I am a" Worker/Agent selector
+        // is carried through as ?role=worker|agent (see register.blade.php).
+        // The login page's Google/Facebook buttons intentionally do NOT send
+        // this param — see callback() below for why that distinction matters.
         $role = $request->query('role');
 
         if (in_array($role, $this->allowedSignupRoles, true)) {
@@ -66,14 +58,13 @@ class SocialAuthController extends Controller
         $name      = $socialUser->getName() ?? $socialUser->getNickname() ?? 'User';
         $avatar    = $socialUser->getAvatar();
 
-        // Pull the role stashed in redirect() above. Default to 'worker' if
-        // it's missing/invalid (e.g. someone hits the callback URL directly
-        // without going through redirect() first) — never trust unvalidated
-        // input for a security-relevant field like role.
-        $signupRole = session()->pull('social_signup_role');
-        if (! in_array($signupRole, $this->allowedSignupRoles, true)) {
-            $signupRole = 'worker';
-        }
+        // Pull whatever redirect() stashed. We deliberately keep the RAW
+        // pulled value (rather than defaulting straight to 'worker') so we
+        // can tell apart "came from register page with an explicit role"
+        // from "came from login page with no role context at all" — see
+        // the no-account-found branch below.
+        $signupRoleRaw  = session()->pull('social_signup_role');
+        $hasExplicitRole = in_array($signupRoleRaw, $this->allowedSignupRoles, true);
 
         // 1. Find by social ID
         $user = User::where($column, $socialId)->first();
@@ -87,9 +78,28 @@ class SocialAuthController extends Controller
             }
         }
 
-        // 3. Create new user (role = whatever was selected on the
-        // registration form, worker or agent — see $signupRole above)
+        // 3. No existing account found.
         if (! $user) {
+            // BUG FIX (Step 10.9 audit — Helal-reported): previously this
+            // always silently created a new user with role forced to
+            // 'worker'. That's wrong in two ways:
+            //   a) if they came from the registration page but somehow
+            //      picked "agent", their choice must be honored (handled
+            //      via $signupRoleRaw below);
+            //   b) if they came from the LOGIN page (no role context at
+            //      all — login has no "who are you" selector, nor should
+            //      it), we must NOT guess a role and auto-create an
+            //      account. Instead, send them to registration with their
+            //      name/email prefilled so they can consciously choose
+            //      Worker or Agent and complete signup properly.
+            if (! $hasExplicitRole) {
+                return redirect()->route('register')
+                    ->withInput(['name' => $name, 'email' => $email])
+                    ->withErrors([
+                        'social' => 'এই ইমেইল/অ্যাকাউন্ট দিয়ে কোনো প্রোফাইল পাওয়া যায়নি। অনুগ্রহ করে আপনি Worker নাকি Agent তা বেছে নিয়ে রেজিস্ট্রেশন সম্পন্ন করুন।',
+                    ]);
+            }
+
             $user = new User([
                 'name'   => $name,
                 'email'  => $email ?? $socialId . '@social.placeholder',
@@ -99,7 +109,7 @@ class SocialAuthController extends Controller
             // role, account_source, social_id & email_verified_at are guarded, so forceFill is required
             $user->forceFill([
                 'password'          => bcrypt(Str::random(32)),
-                'role'              => $signupRole,
+                'role'              => $signupRoleRaw, // validated above via $hasExplicitRole
                 'account_source'    => 'self_registered',
                 $column             => $socialId,
                 'email_verified_at' => now(), // Social = already verified

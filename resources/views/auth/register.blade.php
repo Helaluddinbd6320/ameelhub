@@ -20,6 +20,20 @@
             </div>
         @endif
 
+        {{--
+            BUG FIX (Step 10.9 audit): shown when SocialAuthController redirects
+            here because someone clicked Google/Facebook on the LOGIN page with
+            no matching existing account — rather than silently creating a
+            'worker' account for them, they land here with name/email prefilled
+            (via withInput()) and are asked to consciously pick Worker/Agent.
+        --}}
+        @error('social')
+            <div class="rounded-xl px-4 py-2.5 text-xs text-center border" 
+                 style="background-color:rgba(201,151,76,0.12); color:#f3d9ad; border-color:rgba(201,151,76,0.3);">
+                {{ $message }}
+            </div>
+        @enderror
+
         <!-- Name -->
         <div>
             <label for="name" class="block text-xs font-medium text-white/70 mb-1.5">নাম (Name)</label>
@@ -64,26 +78,14 @@
         </div>
 
         <!-- Role Selection -->
-        <div class="relative" id="role-select-wrapper">
-            <div class="flex items-center gap-1.5 mb-1.5">
-                <label class="block text-xs font-medium text-white/70">আমি কে? / I am a <span style="color:#f3a4a4;">*</span></label>
-
-                {{-- Bouncing hint — শুধু তখনই দেখা যাবে যখন কেউ role না বেছে
-                     Google/Facebook বাটনে ক্লিক করার চেষ্টা করবে --}}
-                <span id="role-hint-arrow"
-                      class="hidden items-center gap-1 text-xs font-semibold"
-                      style="color:#C9974C; animation: bounce-horizontal 0.8s ease-in-out infinite;">
-                    👈 এখানে বেছে নিন
-                </span>
-            </div>
-
+        <div>
+            <label class="block text-xs font-medium text-white/70 mb-1.5">আমি কে? / I am a</label>
             <div class="flex gap-3">
                 {{-- Worker Card --}}
                 <label id="label-worker" class="flex-1 flex items-center gap-2 cursor-pointer rounded-2xl border px-3.5 py-3 transition-all"
-                       style="{{ old('role') === 'worker' ? 'border-color:#C9974C; background-color:rgba(201,151,76,0.12);' : 'border-color:rgba(255,255,255,0.2); background-color:rgba(255,255,255,0.04);' }}">
+                       style="{{ old('role', 'worker') === 'worker' ? 'border-color:#C9974C; background-color:rgba(201,151,76,0.12);' : 'border-color:rgba(255,255,255,0.2); background-color:rgba(255,255,255,0.04);' }}">
                     <input type="radio" name="role" value="worker" id="role-worker"
-                        {{ old('role') === 'worker' ? 'checked' : '' }}
-                        required
+                        {{ old('role', 'worker') === 'worker' ? 'checked' : '' }}
                         style="accent-color:#C9974C;"
                         onchange="updateRoles('worker')"/>
                     <span class="text-xs font-medium text-white">🧑‍🔧 কর্মী (Worker)</span>
@@ -94,7 +96,6 @@
                        style="{{ old('role') === 'agent' ? 'border-color:#C9974C; background-color:rgba(201,151,76,0.12);' : 'border-color:rgba(255,255,255,0.2); background-color:rgba(255,255,255,0.04);' }}">
                     <input type="radio" name="role" value="agent" id="role-agent"
                         {{ old('role') === 'agent' ? 'checked' : '' }}
-                        required
                         style="accent-color:#C9974C;"
                         onchange="updateRoles('agent')"/>
                     <span class="text-xs font-medium text-white">🤝 এজেন্ট (Agent)</span>
@@ -178,12 +179,6 @@
                     (see updateRoles() below), so whichever card is selected
                     when the person clicks Google/Facebook is what actually
                     gets sent to the backend.
-
-                    Step 10.9b: role is no longer pre-selected by default —
-                    the person must consciously choose Worker/Agent before a
-                    social redirect is allowed. If they click without
-                    choosing, we block the navigation and bounce a hint arrow
-                    next to the selector instead (see click handlers below).
                 --}}
                 <a id="social-google" href="{{ route('social.redirect', 'google') }}"
                     data-base-url="{{ route('social.redirect', 'google') }}"
@@ -215,19 +210,6 @@
         </p>
     </form>
 
-    {{-- Custom horizontal-bounce animation — Tailwind-এর animate-bounce
-         উপর-নিচে বাউন্স করে, এটা role-hint arrow-র জন্য ডানে-বামে বাউন্স করে --}}
-    <style>
-        @keyframes bounce-horizontal {
-            0%, 100% {
-                transform: translateX(0);
-            }
-            50% {
-                transform: translateX(-6px);
-            }
-        }
-    </style>
-
     {{-- Script for Radio Button Background Styling + Social Link role sync --}}
     <script>
         function updateSocialLinks(role) {
@@ -237,28 +219,6 @@
                 const base = link.getAttribute('data-base-url');
                 link.setAttribute('href', base + '?role=' + encodeURIComponent(role));
             });
-        }
-
-        function hideRoleHint() {
-            const hint = document.getElementById('role-hint-arrow');
-            if (hint) {
-                hint.classList.add('hidden');
-                hint.classList.remove('flex');
-            }
-        }
-
-        function showRoleHint() {
-            const hint = document.getElementById('role-hint-arrow');
-            if (hint) {
-                hint.classList.remove('hidden');
-                hint.classList.add('flex');
-            }
-            // role selector-এর কাছে স্ক্রল করে দেখানো, বিশেষত মোবাইলে যদি
-            // ফর্মের নিচের দিকে থাকে
-            const wrapper = document.getElementById('role-select-wrapper');
-            if (wrapper) {
-                wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
         }
 
         function updateRoles(selected) {
@@ -278,38 +238,15 @@
             }
 
             updateSocialLinks(selected);
-            hideRoleHint(); // role বেছে নেওয়ার সাথে সাথে hint সরে যাবে
         }
 
-        function getSelectedRole() {
-            const checked = document.querySelector('input[name="role"]:checked');
-            return checked ? checked.value : null;
-        }
-
-        // Google/Facebook বাটনে ক্লিক করার সময় role সিলেক্ট করা আছে কিনা যাচাই —
-        // না থাকলে redirect আটকে দিয়ে bouncing hint দেখানো হবে।
-        function handleSocialClick(event) {
-            const role = getSelectedRole();
-            if (! role) {
-                event.preventDefault();
-                showRoleHint();
-                return false;
-            }
-        }
-
+        // Set the initial href on page load to match whichever radio is
+        // checked by default (respects old('role') on validation-error
+        // redisplay too, since the radio 'checked' state above already
+        // reflects old('role', 'worker')).
         document.addEventListener('DOMContentLoaded', function () {
-            const googleLink = document.getElementById('social-google');
-            const facebookLink = document.getElementById('social-facebook');
-
-            if (googleLink) googleLink.addEventListener('click', handleSocialClick);
-            if (facebookLink) facebookLink.addEventListener('click', handleSocialClick);
-
-            // validation error-এর পর ফিরে এলে (old('role') সেট থাকলে) href
-            // আগে থেকেই ঠিকভাবে সেট করে দেওয়া
-            const initialRole = getSelectedRole();
-            if (initialRole) {
-                updateSocialLinks(initialRole);
-            }
+            const checked = document.querySelector('input[name="role"]:checked');
+            updateSocialLinks(checked ? checked.value : 'worker');
         });
     </script>
 </x-guest-layout>
