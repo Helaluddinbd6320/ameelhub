@@ -22,8 +22,14 @@
     <form wire:submit="saveDraft">
         {{ $this->form }}
 
+        {{--
+            BUG FIX (Helal-reported): the line that used to sit here —
+            {{ $this->getFormActions()[0] ?? '' }} — rendered the first
+            action (সংরক্ষণ করুন / Draft) a second time, on top of the
+            @foreach below which already renders every action including
+            that same first one. Removed; the @foreach alone is enough.
+        --}}
         <div class="mt-6 flex gap-3">
-            {{ $this->getFormActions()[0] ?? '' }}
             @foreach ($this->getFormActions() as $action)
                 {{ $action }}
             @endforeach
