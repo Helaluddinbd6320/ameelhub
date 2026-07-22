@@ -115,6 +115,25 @@ class MyJobPostsTable
                     ->modalDescription('এই জব পোস্ট Admin এর কাছে অনুমোদনের জন্য পাঠানো হবে।')
                     ->modalSubmitActionLabel('হ্যাঁ, পাঠান')
                     ->action(function (JobPost $r) {
+                        // BUSINESS FIX (Helal-reported, Step 10.9 audit): block
+                        // Job Post submission from agents whose email is not
+                        // yet verified — one of the four sensitive actions
+                        // gated per the email-verification decision (CV
+                        // submit, Job post submit, Withdrawal, Recharge).
+                        // Draft creation/editing stays open; only this actual
+                        // "send to admin for review" step is gated, matching
+                        // how CV submission is gated at CvApprovalService::
+                        // deductFee() rather than at initial profile creation.
+                        if (! auth()->user()->hasVerifiedEmail()) {
+                            Notification::make()
+                                ->title('ইমেইল ভেরিফাই করা হয়নি')
+                                ->body('Job Post সাবমিট করার আগে আপনার ইমেইল ভেরিফাই করতে হবে। প্যানেলের উপরের ব্যানার থেকে ভেরিফিকেশন লিংক পাঠান।')
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
                         $r->status = 'pending';
                         $r->save();
 

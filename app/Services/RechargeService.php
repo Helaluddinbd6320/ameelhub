@@ -34,6 +34,15 @@ class RechargeService
         ?string $referenceNumber,
         ?string $proofFilePath
     ): RechargeRequest {
+        // BUSINESS FIX (Helal-reported, Step 10.9 audit): block recharge
+        // requests from users whose email is not yet verified — one of the
+        // four sensitive actions gated per the email-verification decision
+        // (CV submit, Job post submit, Withdrawal, Recharge). Login/panel
+        // browsing intentionally stays open for unverified users.
+        if (! $user->hasVerifiedEmail()) {
+            throw new \RuntimeException('Recharge request পাঠানোর আগে আপনার ইমেইল ভেরিফাই করতে হবে।');
+        }
+
         if ($amount <= 0) {
             throw new \InvalidArgumentException('পরিমাণ শূন্যের বেশি হতে হবে।');
         }

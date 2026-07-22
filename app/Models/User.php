@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Models\AgentProfile;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,9 +15,22 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser
+// BUG FIX (Helal-reported, Step 10.9 audit): User previously had no
+// email-verification support at all — anyone could register with a
+// fake/typo'd email and use the platform fully, since MustVerifyEmail
+// was never implemented (Laravel's stock SendEmailVerificationNotification
+// listener silently no-ops for users that don't implement this contract).
+//
+// Business decision: do NOT block login/panel access for unverified
+// users — only specific sensitive actions (CV submit, Job post submit,
+// Withdrawal request, Recharge request) are gated at the action level
+// (see CvApprovalService / JobPost submit / WithdrawalService::request /
+// RechargeService::request). Implementing MustVerifyEmailContract + the
+// trait here is what makes hasVerifiedEmail() work and lets the
+// Registered event automatically fire the verification email.
+class User extends Authenticatable implements FilamentUser, MustVerifyEmailContract
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, MustVerifyEmail;
 
     protected $fillable = [
         'name',

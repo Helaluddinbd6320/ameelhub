@@ -32,6 +32,20 @@ class WithdrawalService
         string $method,
         string $accountDetails
     ): WithdrawalRequest {
+        // SECURITY/BUSINESS FIX (Helal-reported, Step 10.9 audit): block
+        // withdrawal requests from users whose email is not yet verified —
+        // this is one of the four sensitive actions (CV submit, Job post
+        // submit, Withdrawal, Recharge) gated per the email-verification
+        // business decision. Login/panel browsing intentionally stays open
+        // for unverified users, so this check lives here at the
+        // money-movement entry point rather than blocking panel access
+        // entirely. Checked here (service layer, defense-in-depth) in
+        // addition to whatever early UI-level check the calling Livewire
+        // component/action performs.
+        if (! $user->hasVerifiedEmail()) {
+            throw new \RuntimeException('Withdrawal request পাঠানোর আগে আপনার ইমেইল ভেরিফাই করতে হবে।');
+        }
+
         // Section 1: Pre-transaction validations (fail fast, বাংলা মেসেজ সহ)
         // এগুলো শুধু dry-run/early-fail এর জন্য — লক নেওয়ার আগেই স্পষ্ট
         // ভ্যালিডেশন এরর ইউজারকে দ্রুত দেখানোর জন্য। প্রকৃত নিশ্চয়তার জন্য

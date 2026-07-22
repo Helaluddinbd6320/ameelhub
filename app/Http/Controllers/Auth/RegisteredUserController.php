@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
 use App\Services\ReferralService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -70,10 +69,26 @@ class RegisteredUserController extends Controller
             session()->forget('referral_code');
         }
 
+        // This fires Laravel's built-in SendEmailVerificationNotification
+        // listener automatically now that User implements MustVerifyEmail
+        // (added in this same audit) — no extra code needed here for that.
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(RouteServiceProvider::HOME);
+        // BUG FIX (Step 10.9 audit — same class of bug already found and
+        // fixed in SocialAuthController): App\Providers\RouteServiceProvider
+        // does not exist in Laravel 11+/12's slim bootstrap structure, so
+        // every successful email/password registration was throwing "Class
+        // ... not found" right after Auth::login() — this was very likely
+        // silently breaking ALL normal (non-social) registrations in
+        // production. Redirect by role instead, same pattern used
+        // everywhere else in this project (User::canAccessPanel(),
+        // SocialAuthController::callback()).
+        return redirect()->intended(match ($user->role) {
+            'super_admin', 'admin', 'staff' => '/admin',
+            'agent' => '/agent',
+            default => '/worker',
+        });
     }
 }

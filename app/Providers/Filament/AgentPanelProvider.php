@@ -32,6 +32,13 @@ class AgentPanelProvider extends PanelProvider
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
                 fn(): string => Blade::render('@livewire(\'notification-bell\')'),
             )
+            // BUG FIX (Helal-reported, Step 10.9 audit): same email-verification
+            // nudge banner as WorkerPanelProvider — see that file's comment
+            // for the full rationale.
+            ->renderHook(
+                PanelsRenderHook::CONTENT_START,
+                fn(): string => Blade::render("@include('partials.verify-email-banner')"),
+            )
             ->path('agent')
             ->login()
             ->authGuard('web')

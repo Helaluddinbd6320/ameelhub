@@ -40,6 +40,16 @@ class CvApprovalService
             throw new RuntimeException("Linked user account not found for Worker #{$worker->id}.");
         }
 
+        // BUSINESS FIX (Helal-reported, Step 10.9 audit): block CV
+        // submission (which charges the CV approval fee and sends it for
+        // admin review) from users whose email is not yet verified — one
+        // of the four sensitive actions gated per the email-verification
+        // decision (CV submit, Job post submit, Withdrawal, Recharge).
+        // Checked here rather than blocking login/panel access entirely.
+        if (! $user->hasVerifiedEmail()) {
+            throw new RuntimeException('CV জমা দেওয়ার আগে আপনার ইমেইল ভেরিফাই করতে হবে।');
+        }
+
         $transaction = DB::transaction(function () use ($worker, $user) {
             // WalletService::deduct() নিজেই lockForUpdate() করে এবং
             // insufficient balance হলে WalletException ছোঁড়ে।

@@ -32,6 +32,16 @@ class WorkerPanelProvider extends PanelProvider
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
                 fn(): string => Blade::render('@livewire(\'notification-bell\')'),
             )
+            // BUG FIX (Helal-reported, Step 10.9 audit): email-verification
+            // nudge banner. Login/panel access intentionally stays open for
+            // unverified users (business decision) — this just renders a
+            // persistent reminder + one-click resend at the top of every
+            // page's content. Actual blocking happens at the action level
+            // (CV submit / Withdrawal / Recharge), not here.
+            ->renderHook(
+                PanelsRenderHook::CONTENT_START,
+                fn(): string => Blade::render("@include('partials.verify-email-banner')"),
+            )
             ->path('worker')
             ->login()
             ->authGuard('web')
