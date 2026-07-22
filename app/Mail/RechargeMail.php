@@ -66,7 +66,7 @@ class RechargeMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.recharge',
+            markdown: 'mail.recharge',
         );
     }
 
