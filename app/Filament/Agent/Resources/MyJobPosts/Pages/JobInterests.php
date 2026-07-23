@@ -32,8 +32,17 @@ class JobInterests extends Page implements HasTable
     {
         $this->record = $this->resolveRecord($record);
 
-        // নিজের পোস্ট করা Job ছাড়া এই পেজে ঢোকা যাবে না
-        abort_unless($this->record->posted_by_id === auth()->id(), 403);
+        // BUG FIX (Helal-reported, Step 10.9 audit): this used to be a
+        // strict `===` comparison, which is a classic PHP/PDO gotcha —
+        // MySQL values often come back through PDO as strings (e.g.
+        // "5") while auth()->id() returns an int (5). "5" === 5 is
+        // FALSE in PHP even though they're the same value, so agents
+        // were getting 403'd on their OWN job posts (confirmed: the
+        // MyJobPostsResource list query already scopes by
+        // posted_by_id = auth()->id() via SQL, which isn't affected by
+        // PHP type juggling — only this PHP-side check was broken).
+        // Casting both sides to int makes the comparison type-safe.
+        abort_unless((int) $this->record->posted_by_id === (int) auth()->id(), 403);
     }
 
     public function getBreadcrumb(): string

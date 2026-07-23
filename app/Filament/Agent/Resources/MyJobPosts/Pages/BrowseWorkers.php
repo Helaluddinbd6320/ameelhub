@@ -57,8 +57,12 @@ class BrowseWorkers extends Page implements HasTable
     {
         $this->record = $this->resolveRecord($record);
 
-        // নিজের পোস্ট করা Job ছাড়া এই পেজে ঢোকা যাবে না
-        abort_unless($this->record->posted_by_id === auth()->id(), 403);
+        // BUG FIX (Helal-reported, Step 10.9 audit): same strict-comparison
+        // PDO type-juggling bug fixed in JobInterests.php — MySQL/PDO can
+        // return posted_by_id as a string while auth()->id() is an int,
+        // making the old `===` check falsely reject the actual owner.
+        // See JobInterests.php's mount() for the full explanation.
+        abort_unless((int) $this->record->posted_by_id === (int) auth()->id(), 403);
     }
 
     public function getBreadcrumb(): string
