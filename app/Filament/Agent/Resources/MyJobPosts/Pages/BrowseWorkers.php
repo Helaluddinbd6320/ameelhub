@@ -116,13 +116,17 @@ class BrowseWorkers extends Page implements HasTable
             ->columns([
                 ImageColumn::make('photo')
                     ->label('ছবি')
+                    ->disk('public')
                     ->circular()
                     ->defaultImageUrl(
                         fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->full_name_en ?? 'Worker')
                     ),
                 TextColumn::make('full_name_bn')
                     ->label('নাম')
-                    ->searchable(),
+                    ->searchable()
+                    ->url(fn ($record) => route('workers.show', $record->uuid))
+                    ->color('primary')
+                    ->openUrlInNewTab(),
                 TextColumn::make('skillCategory.name_bn')
                     ->label('দক্ষতা'),
                 TextColumn::make('skill_match')
