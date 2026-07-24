@@ -18,18 +18,19 @@ class RechargeRequestsTable
     public static function configure(Table $table): Table
     {
         return $table
-            // PERFORMANCE FIX: eager-load user, user.worker and processedBy to avoid N+1
+            // PERFORMANCE FIX: eager-load user, user.worker এবং processedBy
             ->modifyQueryUsing(fn ($query) => $query->with(['user.worker', 'processedBy']))
             ->columns([
                 TextColumn::make('id')
                     ->label('#')
                     ->sortable(),
 
-                // ইউজারের প্রোফাইল / ওর্কার ছবি
-                ImageColumn::make('user.worker.photo')
+                // ইউজার ওয়ার্কার হলে ওয়ার্কারের ছবি, অন্যথায় ইউজারের অবতার/ডিফল্ট ছবি
+                ImageColumn::make('user_photo')
                     ->label('ছবি')
                     ->disk('public')
                     ->circular()
+                    ->state(fn ($record) => $record->user?->worker?->photo ?? $record->user?->avatar)
                     ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->user->name ?? 'User')),
 
                 TextColumn::make('user.name')
@@ -37,9 +38,18 @@ class RechargeRequestsTable
                     ->description(fn ($record) => $record->user->email ?? null)
                     ->searchable()
                     ->color('primary')
-                    ->url(fn ($record) => $record->user?->uuid 
-                        ? route('agents.show', $record->user->uuid) 
-                        : null)
+                    ->url(function ($record) {
+                        if (! $record->user?->uuid) {
+                            return null;
+                        }
+
+                        // ইউজার Worker হলে Workers রুট, অন্যথায় Agents রুট
+                        if ($record->user->worker || $record->user->hasRole('worker')) {
+                            return route('workers.show', $record->user->uuid);
+                        }
+
+                        return route('agents.show', $record->user->uuid);
+                    })
                     ->openUrlInNewTab(),
 
                 TextColumn::make('amount')
@@ -194,6 +204,5 @@ class RechargeRequestsTable
                     }),
             ])
             ->defaultSort('created_at', 'desc');
- 
-            }
+    }
 }
