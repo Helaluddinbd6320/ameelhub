@@ -63,23 +63,27 @@ class JobInterests extends Page implements HasTable
                     ->label('ছবি')
                     ->circular()
                     ->defaultImageUrl(
-                        fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->worker->full_name_en ?? 'Worker')
+                        fn($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->worker->full_name_en ?? 'Worker')
                     ),
                 TextColumn::make('worker.full_name_bn')
                     ->label('নাম')
-                    ->searchable(),
+                    ->url(fn($record) => route('workers.show', $record->worker->uuid))
+                    ->color('primary')
+                    ->searchable()
+                    ->openUrlInNewTab(),
                 TextColumn::make('worker.skillCategory.name_bn')
                     ->label('দক্ষতা'),
+
                 TextColumn::make('interest_source')
                     ->label('উৎস')
                     ->badge()
-                    ->formatStateUsing(fn (string $state) => match ($state) {
+                    ->formatStateUsing(fn(string $state) => match ($state) {
                         'worker_self'  => 'Worker নিজে আবেদন করেছে',
                         'agent_nok'    => 'Nok গ্রহণ করে',
                         'agent_select' => 'Agent সরাসরি জমা দিয়েছে',
                         default        => $state,
                     })
-                    ->color(fn (string $state) => match ($state) {
+                    ->color(fn(string $state) => match ($state) {
                         'worker_self'  => 'info',
                         'agent_nok'    => 'success',
                         'agent_select' => 'warning',
@@ -88,14 +92,14 @@ class JobInterests extends Page implements HasTable
                 TextColumn::make('status')
                     ->label('স্ট্যাটাস')
                     ->badge()
-                    ->formatStateUsing(fn (string $state) => match ($state) {
+                    ->formatStateUsing(fn(string $state) => match ($state) {
                         'pending'  => 'অপেক্ষমান',
                         'selected' => 'Select করা হয়েছে',
                         'rejected' => 'প্রত্যাখ্যাত',
                         'hired'    => 'নিয়োগপ্রাপ্ত',
                         default    => $state,
                     })
-                    ->color(fn (string $state) => match ($state) {
+                    ->color(fn(string $state) => match ($state) {
                         'pending'  => 'warning',
                         'selected' => 'success',
                         'rejected' => 'danger',
@@ -131,7 +135,7 @@ class JobInterests extends Page implements HasTable
                     ->color('success')
                     ->requiresConfirmation()
                     ->modalDescription('এই Worker কে এই Job এর জন্য চূড়ান্ত Select করতে চান? Worker কে নোটিফাই করা হবে এবং সাড়া দেওয়ার জন্য নির্দিষ্ট সময় পাবে।')
-                    ->visible(fn (JobInterest $record) => $record->status === 'pending')
+                    ->visible(fn(JobInterest $record) => $record->status === 'pending')
                     ->action(function (JobInterest $record) {
                         try {
                             app(JobSelectionService::class)->select($record->id, auth()->user());

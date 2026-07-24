@@ -31,7 +31,14 @@ class JobSelectionService
             $interest = JobInterest::lockForUpdate()->findOrFail($jobInterestId);
             $jobPost  = JobPost::lockForUpdate()->findOrFail($interest->job_post_id);
 
-            if ($jobPost->posted_by_id !== $agent->id) {
+            // BUG FIX (Helal-reported, Step 10.9 audit): strict `!==`
+            // comparison is a classic PHP/PDO gotcha — MySQL values can
+            // come back through PDO as strings while $agent->id is an int,
+            // making "5" !== 5 evaluate to TRUE (they're actually equal)
+            // and falsely rejecting the real owner. Same bug class already
+            // fixed in JobInterests.php / BrowseWorkers.php (Agent panel
+            // ownership checks). Casting both sides to int fixes it.
+            if ((int) $jobPost->posted_by_id !== (int) $agent->id) {
                 throw ValidationException::withMessages([
                     'job_interest_id' => 'আপনি শুধুমাত্র নিজের পোস্ট করা Job থেকে Worker Select করতে পারবেন।',
                 ]);
@@ -115,7 +122,9 @@ class JobSelectionService
             $selection   = JobSelection::lockForUpdate()->findOrFail($selectionId);
             $workerModel = Worker::where('worker_user_id', $worker->id)->firstOrFail();
 
-            if ($selection->worker_id !== $workerModel->id) {
+            // BUG FIX (Helal-reported, Step 10.9 audit): same PDO
+            // string/int strict-comparison bug as select() above.
+            if ((int) $selection->worker_id !== (int) $workerModel->id) {
                 throw ValidationException::withMessages([
                     'job_selection_id' => 'এই Selection আপনার জন্য নয়।',
                 ]);
@@ -227,7 +236,9 @@ class JobSelectionService
             $selection   = JobSelection::lockForUpdate()->findOrFail($selectionId);
             $workerModel = Worker::where('worker_user_id', $worker->id)->firstOrFail();
 
-            if ($selection->worker_id !== $workerModel->id) {
+            // BUG FIX (Helal-reported, Step 10.9 audit): same PDO
+            // string/int strict-comparison bug as select()/accept() above.
+            if ((int) $selection->worker_id !== (int) $workerModel->id) {
                 throw ValidationException::withMessages([
                     'job_selection_id' => 'এই Selection আপনার জন্য নয়।',
                 ]);
