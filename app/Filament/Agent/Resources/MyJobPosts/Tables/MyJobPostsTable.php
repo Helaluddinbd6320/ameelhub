@@ -16,7 +16,6 @@ use Filament\Tables\Table;
 use App\Filament\Agent\Resources\MyJobPosts\Pages\BrowseWorkers;
 use App\Filament\Agent\Resources\MyJobPosts\Pages\JobInterests;
 
-
 class MyJobPostsTable
 {
     public static function configure(Table $table): Table
@@ -33,7 +32,10 @@ class MyJobPostsTable
                 TextColumn::make('job_title')
                     ->label('জব টাইটেল')
                     ->searchable()
-                    ->description(fn (JobPost $r) => $r->employer_name),
+                    ->description(fn (JobPost $r) => $r->employer_name)
+                    ->color('primary')
+                    ->url(fn (JobPost $r) => $r->uuid ? route('jobs.show', $r->uuid) : null)
+                    ->openUrlInNewTab(),
 
                 TextColumn::make('vacancies')
                     ->label('ভ্যাকেন্সি')
@@ -115,15 +117,6 @@ class MyJobPostsTable
                     ->modalDescription('এই জব পোস্ট Admin এর কাছে অনুমোদনের জন্য পাঠানো হবে।')
                     ->modalSubmitActionLabel('হ্যাঁ, পাঠান')
                     ->action(function (JobPost $r) {
-                        // BUSINESS FIX (Helal-reported, Step 10.9 audit): block
-                        // Job Post submission from agents whose email is not
-                        // yet verified — one of the four sensitive actions
-                        // gated per the email-verification decision (CV
-                        // submit, Job post submit, Withdrawal, Recharge).
-                        // Draft creation/editing stays open; only this actual
-                        // "send to admin for review" step is gated, matching
-                        // how CV submission is gated at CvApprovalService::
-                        // deductFee() rather than at initial profile creation.
                         if (! auth()->user()->hasVerifiedEmail()) {
                             Notification::make()
                                 ->title('ইমেইল ভেরিফাই করা হয়নি')
