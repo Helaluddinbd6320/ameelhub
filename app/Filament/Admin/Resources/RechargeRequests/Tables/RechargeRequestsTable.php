@@ -18,14 +18,14 @@ class RechargeRequestsTable
     public static function configure(Table $table): Table
     {
         return $table
-            // PERFORMANCE FIX: eager-load user, user.worker এবং processedBy
-            ->modifyQueryUsing(fn ($query) => $query->with(['user.worker', 'processedBy']))
+            // PERFORMANCE FIX: eager-load user, user.worker, user.roles এবং processedBy
+            ->modifyQueryUsing(fn ($query) => $query->with(['user.worker', 'user.roles', 'processedBy']))
             ->columns([
                 TextColumn::make('id')
                     ->label('#')
                     ->sortable(),
 
-                // ইউজার ওয়ার্কার হলে ওয়ার্কারের ছবি, অন্যথায় ইউজারের অবতার/ডিফল্ট ছবি
+                // ১. ডাইনামিক প্রোফাইল ছবি (Worker হলে Worker photo, অন্যথায় User avatar)
                 ImageColumn::make('user_photo')
                     ->label('ছবি')
                     ->disk('public')
@@ -33,6 +33,7 @@ class RechargeRequestsTable
                     ->state(fn ($record) => $record->user?->worker?->photo ?? $record->user?->avatar)
                     ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->user->name ?? 'User')),
 
+                // ২. ইউজারের নাম ও ইমেইল + রোল ভিত্তিক ডায়নামিক লিংক
                 TextColumn::make('user.name')
                     ->label('User')
                     ->description(fn ($record) => $record->user->email ?? null)
@@ -51,6 +52,25 @@ class RechargeRequestsTable
                         return route('agents.show', $record->user->uuid);
                     })
                     ->openUrlInNewTab(),
+
+                // ৩. কন্ডিশনাল ইউজার টাইপ ব্যাজ (Worker নাকি Agent)
+                TextColumn::make('user_type')
+                    ->label('টাইপ')
+                    ->badge()
+                    ->state(function ($record) {
+                        if ($record->user?->worker || $record->user?->hasRole('worker')) {
+                            return 'Worker';
+                        }
+                        if ($record->user?->hasRole('agent') || $record->user?->hasRole('agency')) {
+                            return 'Agent';
+                        }
+                        return 'User';
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'Worker' => 'info',
+                        'Agent'  => 'warning',
+                        default  => 'gray',
+                    }),
 
                 TextColumn::make('amount')
                     ->label('পরিমাণ (SAR)')
