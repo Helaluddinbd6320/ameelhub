@@ -28,7 +28,12 @@ class WithdrawalRequestsTable
                 TextColumn::make('user.name')
                     ->label('User')
                     ->description(fn ($record) => $record->user->email ?? null)
-                    ->searchable(),
+                    ->searchable()
+                    ->color('primary')
+                    ->url(fn ($record) => $record->user?->uuid 
+                        ? route('agents.show', $record->user->uuid) 
+                        : null)
+                    ->openUrlInNewTab(),
 
                 TextColumn::make('amount')
                     ->label('পরিমাণ (SAR)')
@@ -39,30 +44,30 @@ class WithdrawalRequestsTable
                     ->label('মাধ্যম')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'bank' => 'ব্যাংক',
-                        'bkash' => 'বিকাশ',
-                        'nagad' => 'নগদ',
-                        'stcpay' => 'STC Pay',
-                        'cash' => 'ক্যাশ',
-                        default => $state,
+                        'bank'    => 'ব্যাংক',
+                        'bkash'   => 'বিকাশ',
+                        'nagad'   => 'নগদ',
+                        'stcpay'  => 'STC Pay',
+                        'cash'    => 'ক্যাশ',
+                        default   => $state,
                     }),
 
                 TextColumn::make('status')
                     ->label('স্ট্যাটাস')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
+                        'pending'   => 'warning',
                         'completed' => 'success',
-                        'rejected' => 'danger',
-                        'approved' => 'info',
-                        default => 'gray',
+                        'rejected'  => 'danger',
+                        'approved'  => 'info',
+                        default     => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'pending' => 'অপেক্ষমান',
-                        'approved' => 'অনুমোদিত',
+                        'pending'   => 'অপেক্ষমান',
+                        'approved'  => 'অনুমোদিত',
                         'completed' => 'সম্পন্ন',
-                        'rejected' => 'প্রত্যাখ্যাত',
-                        default => $state,
+                        'rejected'  => 'প্রত্যাখ্যাত',
+                        default     => $state,
                     }),
 
                 TextColumn::make('processedBy.name')
@@ -78,18 +83,18 @@ class WithdrawalRequestsTable
                 SelectFilter::make('status')
                     ->label('স্ট্যাটাস')
                     ->options([
-                        'pending' => 'অপেক্ষমান',
+                        'pending'   => 'অপেক্ষমান',
                         'completed' => 'সম্পন্ন',
-                        'rejected' => 'প্রত্যাখ্যাত',
+                        'rejected'  => 'প্রত্যাখ্যাত',
                     ]),
                 SelectFilter::make('payment_method')
                     ->label('মাধ্যম')
                     ->options([
-                        'bank' => 'ব্যাংক',
-                        'bkash' => 'বিকাশ',
-                        'nagad' => 'নগদ',
+                        'bank'   => 'ব্যাংক',
+                        'bkash'  => 'বিকাশ',
+                        'nagad'  => 'নগদ',
                         'stcpay' => 'STC Pay',
-                        'cash' => 'ক্যাশ',
+                        'cash'   => 'ক্যাশ',
                     ]),
             ])
             ->recordActions([
@@ -97,22 +102,12 @@ class WithdrawalRequestsTable
                     ->label('অনুমোদন করুন')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    // SECURITY FIX (Step 10.7d audit — Option B, user decision):
-                    // Withdrawal approve/reject moves real money out via
-                    // manual bank/bKash/Nagad transfer, so — like "Release
-                    // Milestone" — this is restricted to super_admin/admin
-                    // only. 'staff' can view this resource (read the table)
-                    // but must not see or trigger these action buttons.
                     ->visible(fn ($record) => $record->isPending()
                         && auth()->user()->hasAnyRole(['super_admin', 'admin']))
                     ->requiresConfirmation()
                     ->modalHeading('Withdrawal অনুমোদন করবেন?')
                     ->modalDescription('এই request অনুমোদন করলে ইউজারকে টাকা পাঠাতে হবে (manual transfer) এবং স্ট্যাটাস সম্পন্ন হিসেবে চিহ্নিত হবে।')
                     ->action(function ($record) {
-                        // Defense-in-depth: re-check role inside the action
-                        // itself, not just ->visible(), in case the action
-                        // is ever invoked directly (e.g. via a tampered
-                        // request bypassing the UI visibility check).
                         abort_unless(auth()->user()->hasAnyRole(['super_admin', 'admin']), 403);
 
                         try {
@@ -135,8 +130,6 @@ class WithdrawalRequestsTable
                     ->label('প্রত্যাখ্যান করুন')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    // SECURITY FIX (Step 10.7d audit — Option B, user decision):
-                    // Same super_admin/admin-only restriction as 'approve' above.
                     ->visible(fn ($record) => $record->isPending()
                         && auth()->user()->hasAnyRole(['super_admin', 'admin']))
                     ->schema([
@@ -146,7 +139,6 @@ class WithdrawalRequestsTable
                             ->rows(3),
                     ])
                     ->action(function ($record, array $data) {
-                        // Defense-in-depth: re-check role inside the action itself.
                         abort_unless(auth()->user()->hasAnyRole(['super_admin', 'admin']), 403);
 
                         try {

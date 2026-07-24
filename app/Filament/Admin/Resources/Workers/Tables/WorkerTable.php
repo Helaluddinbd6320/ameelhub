@@ -34,12 +34,14 @@ class WorkerTable
                     ->defaultImageUrl(fn() => asset('images/default-avatar.png'))
                     ->size(48),
 
-
                 TextColumn::make('full_name_bn')
                     ->label('নাম')
                     ->searchable(['full_name_bn', 'full_name_en'])
                     ->sortable()
-                    ->description(fn(Worker $r) => $r->full_name_en),
+                    ->description(fn(Worker $r) => $r->full_name_en)
+                    ->color('primary')
+                    ->url(fn(Worker $r) => $r->uuid ? route('workers.show', $r->uuid) : null)
+                    ->openUrlInNewTab(),
 
                 TextColumn::make('wallet_balance')
                     ->label('ব্যালেন্স')
@@ -66,7 +68,6 @@ class WorkerTable
                             number_format($record->workerUser->held_balance, 2)
                         );
                     }),
-
 
                 TextColumn::make('skillCategory.name_bn')
                     ->label('পেশা')
@@ -167,7 +168,7 @@ class WorkerTable
                     ]),
 
             ])
-            ->recordActions([   // ✅ v5 official: recordActions (not actions)
+            ->recordActions([
 
                 EditAction::make()
                     ->label('এডিট'),

@@ -26,7 +26,10 @@ class JobPostTable
                     ->label('জব টাইটেল')
                     ->searchable()
                     ->sortable()
-                    ->description(fn(JobPost $r) => $r->employer_name),
+                    ->description(fn(JobPost $r) => $r->employer_name)
+                    ->color('primary')
+                    ->url(fn(JobPost $r) => $r->uuid ? route('jobs.show', $r->uuid) : null)
+                    ->openUrlInNewTab(),
 
                 TextColumn::make('employer_city')
                     ->label('শহর')
@@ -77,6 +80,12 @@ class JobPostTable
 
                 TextColumn::make('postedBy.name')
                     ->label('পোস্টকারী')
+                    ->searchable()
+                    ->color('primary')
+                    ->url(fn(JobPost $r) => $r->postedBy?->uuid 
+                        ? route('agents.show', $r->postedBy->uuid) 
+                        : null)
+                    ->openUrlInNewTab()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
@@ -164,11 +173,6 @@ class JobPostTable
                     }),
 
                 // ── CLOSE (Admin override) ──
-                // NOTE: Section 16-তে এই ম্যানুয়াল Admin "Close" এর জন্য আলাদা কোনো
-                // notification event নেই (শুধু job_auto_closed আছে, যেটা Scheduler
-                // কর্তৃক expiry-তে auto-close হলে fire হয় — JobLifecycleService দেখুন)।
-                // তাই ইচ্ছাকৃতভাবে এখানে কোনো NotificationService কল যোগ করা হয়নি।
-                // চাইলে একটা আলাদা job_closed_by_admin ইভেন্ট বানিয়ে দিতে পারি।
                 Action::make('close')
                     ->label('বন্ধ করুন')
                     ->icon('heroicon-o-lock-closed')
