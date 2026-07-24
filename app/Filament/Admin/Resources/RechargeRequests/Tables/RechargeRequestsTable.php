@@ -2,6 +2,8 @@
 
 namespace App\Filament\Admin\Resources\RechargeRequests\Tables;
 
+use App\Filament\Admin\Resources\AgentResource; // 👈 আপনার Agent Resource class
+use App\Filament\Admin\Resources\WorkerResource; // 👈 আপনার Worker Resource class
 use App\Services\RechargeService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
@@ -18,14 +20,12 @@ class RechargeRequestsTable
     public static function configure(Table $table): Table
     {
         return $table
-            // PERFORMANCE FIX: eager-load user, user.worker, user.roles এবং processedBy
             ->modifyQueryUsing(fn ($query) => $query->with(['user.worker', 'user.roles', 'processedBy']))
             ->columns([
                 TextColumn::make('id')
                     ->label('#')
                     ->sortable(),
 
-                // ১. ডাইনামিক প্রোফাইল ছবি (Worker হলে Worker photo, অন্যথায় User avatar)
                 ImageColumn::make('user_photo')
                     ->label('ছবি')
                     ->disk('public')
@@ -33,27 +33,37 @@ class RechargeRequestsTable
                     ->state(fn ($record) => $record->user?->worker?->photo ?? $record->user?->avatar)
                     ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->user->name ?? 'User')),
 
-                // ২. ইউজারের নাম ও ইমেইল + রোল ভিত্তিক ডায়নামিক লিংক
                 TextColumn::make('user.name')
                     ->label('User')
                     ->description(fn ($record) => $record->user->email ?? null)
                     ->searchable()
                     ->color('primary')
+                    ->weight('bold')
                     ->url(function ($record) {
-                        if (! $record->user?->uuid) {
-                            return null;
-                        }
+                        $user = $record->user;
+                        if (! $user) return null;
 
-                        // ইউজার Worker হলে Workers রুট, অন্যথায় Agents রুট
-                        if ($record->user->worker || $record->user->hasRole('worker')) {
-                            return route('workers.show', $record->user->uuid);
-                        }
+                        try {
+                            // ১. ইউজার Worker হলে Worker Resource-এর Edit/View পেজে নিয়ে যাবে
+                            if ($user->worker) {
+                                return WorkerResource::getUrl('edit', ['record' => $user->worker->id]);
+                            }
 
-                        return route('agents.show', $record->user->uuid);
+                            // ২. ইউজার Agent/Agency হলে Agent Resource-এ নিয়ে যাবে
+                            if (class_exists(AgentResource::class)) {
+                                return AgentResource::getUrl('edit', ['record' => $user->id]);
+                            }
+
+                            // ৩. Fallback: যদি ফ্রন্টএন্ড ওয়েবসাইটের পাবলিক প্রোফাইল লিংকে পাঠাতে চান
+                            $identifier = $user->uuid ?? $user->id;
+                            return route('agents.show', $identifier);
+
+                        } catch (\Throwable $e) {
+                            return null; // কোনো কারণে রাউট না মিললে পেজ ক্র্যাশ করবে না
+                        }
                     })
                     ->openUrlInNewTab(),
 
-                // ৩. কন্ডিশনাল ইউজার টাইপ ব্যাজ (Worker নাকি Agent)
                 TextColumn::make('user_type')
                     ->label('টাইপ')
                     ->badge()
