@@ -15,8 +15,13 @@ class MilestoneReceiptController extends Controller
         $deal = $milestone->deal;
         $user = $request->user();
 
-        $isWorker = $deal->worker && $deal->worker->worker_user_id === $user->id;
-        $isAgent  = $deal->agent_id === $user->id;
+        // BUG FIX (Helal-reported, Step 10.9 audit): strict `===` is a PDO
+        // string/int type-mismatch gotcha — MySQL values can come back
+        // through PDO as strings while $user->id is an int. Same bug class
+        // already fixed in JobInterests.php / JobSelectionService.php /
+        // JobDetail.php etc. Casting both sides to int makes it type-safe.
+        $isWorker = $deal->worker && (int) $deal->worker->worker_user_id === (int) $user->id;
+        $isAgent  = (int) $deal->agent_id === (int) $user->id;
         $isAdmin  = in_array($user->role, ['super_admin', 'admin', 'staff'], true);
 
         abort_unless($isWorker || $isAgent || $isAdmin, 403, 'আপনি এই রশিদ দেখার অনুমতিপ্রাপ্ত নন।');

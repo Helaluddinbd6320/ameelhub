@@ -75,7 +75,14 @@ class JobDetail extends Component
 
             if ($user->role === 'agent') {
                 $this->isAgent = true;
-                $this->isOwnJobPost = $this->job->posted_by_id === $user->id;
+                // BUG FIX (Helal-reported, Step 10.9 audit): strict `===`
+                // is a PDO string/int type-mismatch gotcha — MySQL values
+                // can come back through PDO as strings while $user->id is
+                // an int, making "5" === 5 evaluate to FALSE even though
+                // they're the same value. Same bug class already fixed in
+                // JobInterests.php / BrowseWorkers.php / JobSelectionService.php.
+                // Casting both sides to int makes it type-safe.
+                $this->isOwnJobPost = (int) $this->job->posted_by_id === (int) $user->id;
 
                 $agentProfile = AgentProfile::where('user_id', $user->id)->first();
                 $this->isVerifiedAgent = (bool) ($agentProfile?->is_verified);
@@ -295,7 +302,9 @@ class JobDetail extends Component
             return;
         }
 
-        if ($worker->submitted_by_id !== $user->id) {
+        // BUG FIX (Helal-reported, Step 10.9 audit): same PDO string/int
+        // strict-comparison bug as isOwnJobPost above.
+        if ((int) $worker->submitted_by_id !== (int) $user->id) {
             session()->flash('job_error', 'আপনি শুধুমাত্র নিজের সাবমিট করা Worker CV দিয়ে আগ্রহ পাঠাতে পারবেন।');
             $this->closeWorkerModal();
             return;

@@ -27,7 +27,12 @@ class NokService
             $jobPost = JobPost::lockForUpdate()->findOrFail($jobPostId);
             $worker  = Worker::lockForUpdate()->findOrFail($workerId);
 
-            if ($route === 'route_a' && $jobPost->posted_by_id !== auth()->id()) {
+            // BUG FIX (Helal-reported, Step 10.9 audit): strict `!==` is a
+            // PDO string/int type-mismatch gotcha — same bug class already
+            // fixed across JobInterests.php / JobSelectionService.php /
+            // JobDetail.php / MilestoneService.php / DisputeService.php /
+            // ContactRevealService.php etc.
+            if ($route === 'route_a' && (int) $jobPost->posted_by_id !== (int) auth()->id()) {
                 throw ValidationException::withMessages([
                     'job_post_id' => 'আপনি শুধুমাত্র নিজের পোস্ট করা Job থেকে Nok পাঠাতে পারবেন।',
                 ]);
@@ -170,7 +175,9 @@ class NokService
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if ($nok->worker_id !== $workerProfile->id) {
+            // BUG FIX (Helal-reported, Step 10.9 audit): same PDO
+            // string/int strict-comparison bug as send() above.
+            if ((int) $nok->worker_id !== (int) $workerProfile->id) {
                 throw ValidationException::withMessages([
                     'nok_id' => 'এই Nok আপনার জন্য নয়।',
                 ]);
@@ -242,7 +249,9 @@ class NokService
             $workerProfile = Worker::where('worker_user_id', $worker->id)
                 ->firstOrFail();
 
-            if ($nok->worker_id !== $workerProfile->id) {
+            // BUG FIX (Helal-reported, Step 10.9 audit): same PDO
+            // string/int strict-comparison bug as accept() above.
+            if ((int) $nok->worker_id !== (int) $workerProfile->id) {
                 throw ValidationException::withMessages([
                     'nok_id' => 'এই Nok আপনার জন্য নয়।',
                 ]);

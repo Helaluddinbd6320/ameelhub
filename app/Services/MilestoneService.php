@@ -106,7 +106,11 @@ class MilestoneService
         $milestone = DB::transaction(function () use ($milestone, $user) {
             [$milestone, $deal] = $this->lockMilestoneAndDeal($milestone->id);
 
-            if (! $deal->worker || $deal->worker->worker_user_id !== $user->id) {
+            // BUG FIX (Helal-reported, Step 10.9 audit): strict `!==` is a
+            // PDO string/int type-mismatch gotcha — same bug class already
+            // fixed across JobInterests.php / JobSelectionService.php /
+            // JobDetail.php / MilestoneReceiptController.php etc.
+            if (! $deal->worker || (int) $deal->worker->worker_user_id !== (int) $user->id) {
                 throw ValidationException::withMessages([
                     'milestone' => 'আপনি এই মাইলস্টোন কনফার্ম করার অনুমতিপ্রাপ্ত নন।',
                 ]);
@@ -143,7 +147,9 @@ class MilestoneService
         $milestone = DB::transaction(function () use ($milestone, $user) {
             [$milestone, $deal] = $this->lockMilestoneAndDeal($milestone->id);
 
-            if ($deal->agent_id !== $user->id) {
+            // BUG FIX (Helal-reported, Step 10.9 audit): same PDO string/int
+            // strict-comparison bug as confirmByWorker() above.
+            if ((int) $deal->agent_id !== (int) $user->id) {
                 throw ValidationException::withMessages([
                     'milestone' => 'আপনি এই মাইলস্টোন কনফার্ম করার অনুমতিপ্রাপ্ত নন।',
                 ]);

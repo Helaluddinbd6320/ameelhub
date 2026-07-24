@@ -455,11 +455,15 @@ class DisputeService
 
     private function determineRole(JobDeal $deal, User $user): ?string
     {
-        if ($deal->agent_id === $user->id) {
+        // BUG FIX (Helal-reported, Step 10.9 audit): strict `===` is a PDO
+        // string/int type-mismatch gotcha — same bug class already fixed
+        // across JobInterests.php / JobSelectionService.php / JobDetail.php /
+        // MilestoneReceiptController.php / MilestoneService.php etc.
+        if ((int) $deal->agent_id === (int) $user->id) {
             return 'agent';
         }
 
-        if ($deal->worker && $deal->worker->worker_user_id === $user->id) {
+        if ($deal->worker && (int) $deal->worker->worker_user_id === (int) $user->id) {
             return 'worker';
         }
 

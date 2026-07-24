@@ -50,7 +50,14 @@ class ContactRevealService
             ]);
         }
 
-        $isOwnProfile = $worker->worker_user_id === $user->id;
+        // BUG FIX (Helal-reported, Step 10.9 audit): strict `===` is a PDO
+        // string/int type-mismatch gotcha — MySQL values can come back
+        // through PDO as strings while $user->id is an int. Same bug class
+        // already fixed across JobInterests.php / JobSelectionService.php /
+        // JobDetail.php / MilestoneService.php / DisputeService.php etc.
+        // Without this fix, a worker viewing their OWN profile would be
+        // incorrectly charged the 5 SAR contact-reveal fee.
+        $isOwnProfile = (int) $worker->worker_user_id === (int) $user->id;
 
         return DB::transaction(function () use ($worker, $phoneType, $user, $isOwnProfile) {
             // SECURITY FIX (Step 10.7f audit — TOCTOU race):
