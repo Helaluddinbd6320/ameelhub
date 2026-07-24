@@ -62,6 +62,8 @@ class JobInterests extends Page implements HasTable
                 ImageColumn::make('worker.photo')
                     ->label('ছবি')
                     ->circular()
+                    ->disk('public')
+                    ->size(48)
                     ->defaultImageUrl(
                         fn($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->worker->full_name_en ?? 'Worker')
                     ),
