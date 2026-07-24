@@ -6,6 +6,7 @@ use App\Services\RechargeService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -17,19 +18,29 @@ class RechargeRequestsTable
     public static function configure(Table $table): Table
     {
         return $table
-            // PERFORMANCE FIX (Step 10.8): eager-load user + processedBy to avoid
-            // N+1 queries — user.name/email and processedBy.name are rendered
-            // per-row below, so without this every row triggers 2 extra queries.
-            ->modifyQueryUsing(fn ($query) => $query->with(['user', 'processedBy']))
+            // PERFORMANCE FIX: eager-load user, user.worker and processedBy to avoid N+1
+            ->modifyQueryUsing(fn ($query) => $query->with(['user.worker', 'processedBy']))
             ->columns([
                 TextColumn::make('id')
                     ->label('#')
                     ->sortable(),
 
+                // ইউজারের প্রোফাইল / ওর্কার ছবি
+                ImageColumn::make('user.worker.photo')
+                    ->label('ছবি')
+                    ->disk('public')
+                    ->circular()
+                    ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->user->name ?? 'User')),
+
                 TextColumn::make('user.name')
                     ->label('User')
                     ->description(fn ($record) => $record->user->email ?? null)
-                    ->searchable(),
+                    ->searchable()
+                    ->color('primary')
+                    ->url(fn ($record) => $record->user?->uuid 
+                        ? route('agents.show', $record->user->uuid) 
+                        : null)
+                    ->openUrlInNewTab(),
 
                 TextColumn::make('amount')
                     ->label('পরিমাণ (SAR)')
@@ -40,12 +51,12 @@ class RechargeRequestsTable
                     ->label('মাধ্যম')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'bank' => 'ব্যাংক',
-                        'bkash' => 'বিকাশ',
-                        'nagad' => 'নগদ',
-                        'stcpay' => 'STC Pay',
-                        'cash' => 'ক্যাশ',
-                        default => $state,
+                        'bank'    => 'ব্যাংক',
+                        'bkash'   => 'বিকাশ',
+                        'nagad'   => 'নগদ',
+                        'stcpay'  => 'STC Pay',
+                        'cash'    => 'ক্যাশ',
+                        default   => $state,
                     }),
 
                 TextColumn::make('reference_number')
@@ -58,16 +69,16 @@ class RechargeRequestsTable
                     ->label('স্ট্যাটাস')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
+                        'pending'  => 'warning',
                         'approved' => 'success',
                         'rejected' => 'danger',
-                        default => 'gray',
+                        default    => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'pending' => 'অপেক্ষমান',
+                        'pending'  => 'অপেক্ষমান',
                         'approved' => 'অনুমোদিত',
                         'rejected' => 'প্রত্যাখ্যাত',
-                        default => $state,
+                        default    => $state,
                     }),
 
                 TextColumn::make('processedBy.name')
@@ -83,30 +94,21 @@ class RechargeRequestsTable
                 SelectFilter::make('status')
                     ->label('স্ট্যাটাস')
                     ->options([
-                        'pending' => 'অপেক্ষমান',
+                        'pending'  => 'অপেক্ষমান',
                         'approved' => 'অনুমোদিত',
                         'rejected' => 'প্রত্যাখ্যাত',
                     ]),
                 SelectFilter::make('payment_method')
                     ->label('মাধ্যম')
                     ->options([
-                        'bank' => 'ব্যাংক',
-                        'bkash' => 'বিকাশ',
-                        'nagad' => 'নগদ',
+                        'bank'   => 'ব্যাংক',
+                        'bkash'  => 'বিকাশ',
+                        'nagad'  => 'নগদ',
                         'stcpay' => 'STC Pay',
-                        'cash' => 'ক্যাশ',
+                        'cash'   => 'ক্যাশ',
                     ]),
             ])
             ->recordActions([
-                // FIX (500 error, post-launch bug): Storage::disk('private_docs')
-                // ->temporaryUrl() is NOT supported by Laravel's 'local' filesystem
-                // driver — it throws a RuntimeException the moment a row with a
-                // proof_file renders, since temporaryUrl() only works on cloud
-                // disks (S3 etc.) that support signed URLs natively.
-                //
-                // Fixed by streaming the file directly through a Livewire/Filament
-                // action response (works fine with the local driver, no signed-URL
-                // support needed) instead of trying to generate a URL for ->url().
                 Action::make('view_proof')
                     ->label('প্রুফ দেখুন')
                     ->icon('heroicon-o-photo')
@@ -132,9 +134,6 @@ class RechargeRequestsTable
                     ->label('অনুমোদন করুন')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    // Same Option B gating as WithdrawalRequestsTable::approve —
-                    // super_admin/admin only, staff excluded (this moves real
-                    // money INTO the wallet based on a manually-verified proof).
                     ->visible(fn ($record) => $record->isPending()
                         && auth()->user()->hasAnyRole(['super_admin', 'admin']))
                     ->requiresConfirmation()
@@ -195,5 +194,6 @@ class RechargeRequestsTable
                     }),
             ])
             ->defaultSort('created_at', 'desc');
-    }
+ 
+            }
 }

@@ -37,6 +37,9 @@ class AgentVerificationTable
                     ->label('নাম')
                     ->description(fn ($record) => $record->agent_name_en)
                     ->searchable(['agent_name_bn', 'agent_name_en'])
+                    ->url(fn ($record) => route('agents.show', $record->uuid))
+                    ->color('primary')
+                    ->openUrlInNewTab()
                     ->sortable(),
 
                 TextColumn::make('company_name')

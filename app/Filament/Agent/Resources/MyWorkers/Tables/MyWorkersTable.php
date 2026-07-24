@@ -27,15 +27,19 @@ class MyWorkersTable
             ->columns([
                 ImageColumn::make('photo')
                     ->label('ছবি')
+                    ->disk('public')
                     ->circular()
-                    ->defaultImageUrl(fn () => asset('images/default-avatar.png')),
+                    ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->full_name_en ?? 'Worker')),
 
                 TextColumn::make('full_name_en')
                     ->label('নাম')
                     ->description(fn (Worker $record) => $record->full_name_bn ?? '')
-                    ->searchable(['full_name_en', 'full_name_bn']),
+                    ->searchable(['full_name_en', 'full_name_bn'])
+                    ->url(fn (Worker $record) => route('workers.show', $record->uuid))
+                    ->color('primary')
+                    ->openUrlInNewTab(),
 
-                TextColumn::make('skillCategory.name_en')
+                TextColumn::make('skillCategory.name_bn')
                     ->label('পেশা')
                     ->placeholder('—'),
 
