@@ -2,8 +2,6 @@
 
 namespace App\Filament\Admin\Resources\RechargeRequests\Tables;
 
-use App\Filament\Admin\Resources\AgentResource; // 👈 আপনার Agent Resource class
-use App\Filament\Admin\Resources\WorkerResource; // 👈 আপনার Worker Resource class
 use App\Services\RechargeService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
@@ -20,12 +18,19 @@ class RechargeRequestsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with(['user.worker', 'user.roles', 'processedBy']))
+            // PERFORMANCE FIX: eager-load user.worker, user.agentProfile, user.roles এবং processedBy
+            ->modifyQueryUsing(fn ($query) => $query->with([
+                'user.worker',
+                'user.agentProfile',
+                'user.roles',
+                'processedBy',
+            ]))
             ->columns([
                 TextColumn::make('id')
                     ->label('#')
                     ->sortable(),
 
+                // ১. প্রোফাইল ছবি (Worker হলে Worker photo, অন্যথায় User avatar)
                 ImageColumn::make('user_photo')
                     ->label('ছবি')
                     ->disk('public')
@@ -33,6 +38,7 @@ class RechargeRequestsTable
                     ->state(fn ($record) => $record->user?->worker?->photo ?? $record->user?->avatar)
                     ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->user->name ?? 'User')),
 
+                // ২. ইউজারের নাম ও ইমেইল (পাবলিক প্রোফাইল লিংকের জন্য সঠিক AgentProfile / Worker UUID ব্যবহার করা হয়েছে)
                 TextColumn::make('user.name')
                     ->label('User')
                     ->description(fn ($record) => $record->user->email ?? null)
@@ -41,29 +47,31 @@ class RechargeRequestsTable
                     ->weight('bold')
                     ->url(function ($record) {
                         $user = $record->user;
-                        if (! $user) return null;
 
-                        try {
-                            // ১. ইউজার Worker হলে Worker Resource-এর Edit/View পেজে নিয়ে যাবে
-                            if ($user->worker) {
-                                return WorkerResource::getUrl('edit', ['record' => $user->worker->id]);
-                            }
-
-                            // ২. ইউজার Agent/Agency হলে Agent Resource-এ নিয়ে যাবে
-                            if (class_exists(AgentResource::class)) {
-                                return AgentResource::getUrl('edit', ['record' => $user->id]);
-                            }
-
-                            // ৩. Fallback: যদি ফ্রন্টএন্ড ওয়েবসাইটের পাবলিক প্রোফাইল লিংকে পাঠাতে চান
-                            $identifier = $user->uuid ?? $user->id;
-                            return route('agents.show', $identifier);
-
-                        } catch (\Throwable $e) {
-                            return null; // কোনো কারণে রাউট না মিললে পেজ ক্র্যাশ করবে না
+                        if (! $user) {
+                            return null;
                         }
+
+                        // ইউজার Worker হলে Worker Public Profile (Worker-এর UUID দিয়ে)
+                        if ($user->worker && !empty($user->worker->uuid)) {
+                            return route('workers.show', ['worker' => $user->worker->uuid]);
+                        }
+
+                        // ইউজার Agent/Agency হলে AgentProfile-এর UUID দিয়ে
+                        if ($user->agentProfile && !empty($user->agentProfile->uuid)) {
+                            return route('agents.show', ['agentProfile' => $user->agentProfile->uuid]);
+                        }
+
+                        // Fallback: যদি agentProfile না থাকে কিন্তু সরাসরি User-এ UUID থাকে
+                        if (!empty($user->uuid)) {
+                            return route('agents.show', ['agentProfile' => $user->uuid]);
+                        }
+
+                        return null;
                     })
                     ->openUrlInNewTab(),
 
+                // ৩. কন্ডিশনাল ইউজার টাইপ ব্যাজ (Worker নাকি Agent)
                 TextColumn::make('user_type')
                     ->label('টাইপ')
                     ->badge()
