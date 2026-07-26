@@ -39,6 +39,19 @@ class AgentPanelProvider extends PanelProvider
                 PanelsRenderHook::CONTENT_START,
                 fn(): string => Blade::render("@include('partials.verify-email-banner')"),
             )
+            // PHASE 11 — Step 11.1 (PWA): manifest link, theme-color, apple-touch-icon.
+            // Scoped to this panel via manifest-agent.json (scope: /agent/).
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn(): string => Blade::render("@include('partials.pwa-head', ['panel' => 'agent'])"),
+            )
+            // PHASE 11 — Step 11.1 (PWA): registers /sw.js scoped to /agent/ only,
+            // and renders the dismissible install banner (beforeinstallprompt on
+            // Android/Chrome, manual instructions on iOS Safari).
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn(): string => Blade::render("@include('partials.pwa-register', ['panel' => 'agent'])"),
+            )
             ->path('agent')
             ->login()
             ->authGuard('web')

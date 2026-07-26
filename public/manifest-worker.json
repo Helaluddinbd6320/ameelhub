@@ -1,0 +1,19 @@
+{
+  "name": "AmeelHub - Worker",
+  "short_name": "AmeelHub",
+  "description": "AmeelHub Worker Panel — CV, Job, Wallet",
+  "start_url": "/worker",
+  "scope": "/worker/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#F54A00",
+  "orientation": "portrait",
+  "lang": "bn",
+  "dir": "ltr",
+  "icons": [
+    { "src": "/icons/icon-worker-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-worker-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-worker-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-worker-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
