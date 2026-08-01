@@ -6,6 +6,7 @@ use App\Filament\Agent\Resources\MyJobPosts\MyJobPostsResource;
 use App\Models\AgentNok;
 use App\Models\Setting;
 use App\Models\Worker;
+use App\Services\JobMatchService;
 use App\Services\NokService;
 use Filament\Actions\BulkAction;
 use Filament\Actions\Action as TableAction;
@@ -53,6 +54,15 @@ class BrowseWorkers extends Page implements HasTable
      */
     protected ?SupportCollection $agentNoksForJob = null;
 
+    /**
+     * Step 11.3 (AI Job Match): এই পেজের বর্তমান পাতায় দেখানো workers এর জন্য
+     * match score cache — একই record এর জন্য state()/color()/tooltip() তিনবার
+     * আলাদা করে score recalculate না করার জন্য memoize করা।
+     *
+     * @var array<int, array{skill:int, location:int, salary:int, visa:int, total:int}>
+     */
+    protected array $matchScoreCache = [];
+
     public function mount(int | string $record): void
     {
         $this->record = $this->resolveRecord($record);
@@ -99,20 +109,30 @@ class BrowseWorkers extends Page implements HasTable
             ->keyBy('worker_id');
     }
 
+    /**
+     * Step 11.3 (AI Job Match): memoized score lookup — প্রতি row একবারই
+     * JobMatchService::score() কল হয়, state/color/tooltip তিনটাতেই একই cache থেকে read করে।
+     *
+     * @return array{skill:int, location:int, salary:int, visa:int, total:int}
+     */
+    protected function getMatchScore(Worker $worker): array
+    {
+        return $this->matchScoreCache[$worker->id] ??= app(JobMatchService::class)->score($worker, $this->record);
+    }
+
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                Worker::query()
-                    ->where('status', 'active')
-                    ->when(
-                        $this->record->skill_category_id,
-                        fn (Builder $q) => $q->orderByRaw(
-                            'skill_category_id = ? DESC',
-                            [$this->record->skill_category_id]
-                        )
-                    )
-            )
+            ->query(function () {
+                $query = Worker::query()->where('status', 'active');
+
+                // Step 11.3 (AI Job Match): আগে শুধু exact skill match দিয়ে sort হতো।
+                // এখন skill(40%) + location(20%) + salary(20%) + visa(20%) — সব
+                // মিলিয়ে একটা approximate score SQL-এ CASE expression দিয়ে
+                // ORDER BY করা হয়, যাতে পেজিনেশন DB-level এই ঠিক থাকে (সব worker
+                // PHP-তে লোড না করেই)।
+                return app(JobMatchService::class)->orderByMatchScore($query, $this->record);
+            })
             ->columns([
                 ImageColumn::make('photo')
                     ->label('ছবি')
@@ -129,11 +149,17 @@ class BrowseWorkers extends Page implements HasTable
                     ->openUrlInNewTab(),
                 TextColumn::make('skillCategory.name_bn')
                     ->label('দক্ষতা'),
-                TextColumn::make('skill_match')
-                    ->label('মিল')
+                // ── Step 11.3: exact-skill-only badge এর জায়গায় পূর্ণ ওয়েটেড ম্যাচ স্কোর ──
+                TextColumn::make('match_score')
+                    ->label('ম্যাচ স্কোর')
                     ->badge()
-                    ->state(fn ($record) => $record->skill_category_id === $this->record->skill_category_id ? 'ম্যাচ' : '—')
-                    ->color(fn ($record) => $record->skill_category_id === $this->record->skill_category_id ? 'success' : 'gray'),
+                    ->state(fn ($record) => $this->getMatchScore($record)['total'] . '%')
+                    ->color(fn ($record) => app(JobMatchService::class)->color($this->getMatchScore($record)['total']))
+                    ->tooltip(function ($record) {
+                        $s = $this->getMatchScore($record);
+
+                        return "দক্ষতা: {$s['skill']}/40 · অবস্থান: {$s['location']}/20 · বেতন: {$s['salary']}/20 · ভিসা: {$s['visa']}/20";
+                    }),
                 TextColumn::make('experience_years')
                     ->label('মোট অভিজ্ঞতা (বছর)'),
                 TextColumn::make('experience_saudi_years')
