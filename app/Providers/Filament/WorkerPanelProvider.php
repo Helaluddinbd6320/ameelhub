@@ -9,6 +9,7 @@ use App\Http\Middleware\RedirectToCentralLogin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Navigation\MenuItem;
@@ -73,7 +74,15 @@ class WorkerPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/worker/theme.css')
             ->discoverResources(in: app_path('Filament/Worker/Resources'), for: 'App\\Filament\\Worker\\Resources')
             ->discoverPages(in: app_path('Filament/Worker/Pages'), for: 'App\\Filament\\Worker\\Pages')
-            ->pages([])
+            // BUG FIX (Step 11.3 audit): ->pages([]) was overriding Filament's
+            // default [Dashboard::class], meaning /worker had NO Dashboard page
+            // registered at all — the home route fell back to the first sidebar
+            // item (My Profile) every time, regardless of CV completeness. This
+            // is why the "আপনার জন্য সেরা Job" widget never appeared: there was
+            // no Dashboard page for it to attach to in the first place.
+            ->pages([
+                Dashboard::class,
+            ])
             ->discoverWidgets(in: app_path('Filament/Worker/Widgets'), for: 'App\\Filament\\Worker\\Widgets')
             ->widgets([])
             ->middleware([
