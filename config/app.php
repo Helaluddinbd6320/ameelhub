@@ -85,10 +85,17 @@ return [
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
 
+    // Step: new-locales — added tl (Tagalog/Filipino), hi (Hindi), ur (Urdu)
+    // alongside the original bn/en/ar. ur is RTL, same as ar; tl and hi are
+    // LTR. SetLocale middleware's $supportedLocales must be kept in sync
+    // with the keys here.
     'available_locales' => [
         'bn' => ['label' => 'বাংলা', 'dir' => 'ltr'],
         'en' => ['label' => 'English', 'dir' => 'ltr'],
         'ar' => ['label' => 'العربية', 'dir' => 'rtl'],
+        'tl' => ['label' => 'Tagalog', 'dir' => 'ltr'],
+        'hi' => ['label' => 'हिन्दी', 'dir' => 'ltr'],
+        'ur' => ['label' => 'اردو', 'dir' => 'rtl'],
     ],
 
     /*

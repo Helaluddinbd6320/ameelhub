@@ -16,12 +16,17 @@
             <link href="https://fonts.bunny.net/css?family=noto-sans-arabic:400,500,600&display=swap" rel="stylesheet" />
         @elseif(app()->getLocale() === 'bn')
             <link href="https://fonts.bunny.net/css?family=noto-sans-bengali:400,500,600&display=swap" rel="stylesheet" />
+        @elseif(app()->getLocale() === 'hi')
+            <link href="https://fonts.bunny.net/css?family=noto-sans-devanagari:400,500,600&display=swap" rel="stylesheet" />
+        @elseif(app()->getLocale() === 'ur')
+            <link href="https://fonts.bunny.net/css?family=noto-nastaliq-urdu:400,500,600,700&display=swap" rel="stylesheet" />
         @endif
+        {{-- tl (Tagalog/Filipino) uses the Latin alphabet, so the default Figtree font above already covers it — no extra font needed. --}}
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased @if(app()->getLocale() === 'ur') font-urdu @endif">
         <div class="min-h-screen bg-gray-100">
             @include('layouts.navigation')
 

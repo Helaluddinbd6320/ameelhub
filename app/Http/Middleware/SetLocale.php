@@ -10,8 +10,13 @@ class SetLocale
 {
     /**
      * Locales AmeelHub supports, in priority order.
+     *
+     * bn/en/ar were the original set (Bangladeshi + Arabic-speaking employers).
+     * tl (Tagalog/Filipino), hi (Hindi), ur (Urdu) added to reach Filipino,
+     * Indian, and Pakistani workers. ur is RTL, same as ar — see the main
+     * layout's dir/font handling.
      */
-    protected array $supportedLocales = ['bn', 'en', 'ar'];
+    protected array $supportedLocales = ['bn', 'en', 'ar', 'tl', 'hi', 'ur'];
 
     public function handle(Request $request, Closure $next): Response
     {
