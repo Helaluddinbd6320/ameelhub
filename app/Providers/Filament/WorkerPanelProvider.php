@@ -62,6 +62,18 @@ class WorkerPanelProvider extends PanelProvider
             ->authGuard('web')
             ->registration(false)
             ->userMenuItems([
+                'lang_bn' => MenuItem::make()
+                    ->label(fn () => app()->getLocale() === 'bn' ? '✓ বাংলা' : 'বাংলা')
+                    ->icon('heroicon-o-language')
+                    ->url(fn () => url('/lang/bn')),
+                'lang_en' => MenuItem::make()
+                    ->label(fn () => app()->getLocale() === 'en' ? '✓ English' : 'English')
+                    ->icon('heroicon-o-language')
+                    ->url(fn () => url('/lang/en')),
+                'lang_ar' => MenuItem::make()
+                    ->label(fn () => app()->getLocale() === 'ar' ? '✓ العربية' : 'العربية')
+                    ->icon('heroicon-o-language')
+                    ->url(fn () => url('/lang/ar')),
                 'logout' => MenuItem::make()
                     ->label('লগ আউট')
                     ->icon('heroicon-o-arrow-left-on-rectangle')
