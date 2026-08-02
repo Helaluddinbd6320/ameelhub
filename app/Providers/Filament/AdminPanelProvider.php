@@ -28,9 +28,19 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+            // ডেস্কটপে বেল আইকন সার্চের আগে দেখাবে
             ->renderHook(
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
-                fn(): string => Blade::render('@livewire(\'notification-bell\')'),
+                fn(): string => Blade::render(
+                    '<div class="hidden md:block">@livewire(\'notification-bell\', key: \'bell-desktop\')</div>'
+                ),
+            )
+            // মোবাইলে বেল আইকন সার্চের পরে দেখাবে
+            ->renderHook(
+                PanelsRenderHook::GLOBAL_SEARCH_AFTER,
+                fn(): string => Blade::render(
+                    '<div class="block md:hidden">@livewire(\'notification-bell\', key: \'bell-mobile\')</div>'
+                ),
             )
             ->id('admin')
 
