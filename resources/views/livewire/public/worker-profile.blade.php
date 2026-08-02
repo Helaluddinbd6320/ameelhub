@@ -7,7 +7,7 @@
             <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            তালিকায় ফিরে যান
+            {{ __('messages.worker_profile.back_to_list') }}
         </a>
 
         {{-- Flash Messages --}}
@@ -41,7 +41,7 @@
                                  class="w-28 h-28 rounded-3xl object-cover ring-4 ring-white shadow-lg bg-white relative z-10">
                         @else
                             <div class="w-28 h-28 rounded-3xl bg-slate-100 ring-4 ring-white shadow-lg flex items-center justify-center text-slate-400 text-xs font-medium relative z-10">
-                                ছবি নেই
+                                {{ __('messages.worker_profile.no_photo') }}
                             </div>
                         @endif
                     </div>
@@ -56,14 +56,14 @@
                             <div class="flex items-center gap-2">
                                 @if ($worker->status === 'featured')
                                     <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold shadow-sm ring-1 ring-amber-200/50">
-                                        ⭐ FEATURED
+                                        ⭐ {{ __('messages.worker_profile.featured') }}
                                     </span>
                                 @endif
 
                                 @if ($this->isAgent)
                                     <button wire:click="openNokModal"
                                             class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-orange-500 hover:bg-orange-600 active:scale-95 text-white text-sm font-bold shadow-sm shadow-orange-500/30 transition-all">
-                                        📨 Job Offer পাঠাই
+                                        📨 {{ __('messages.worker_profile.send_job_offer') }}
                                     </button>
                                 @endif
                             </div>
@@ -73,9 +73,9 @@
 
                 @guest
                     <div class="mt-4 flex items-center justify-between rounded-2xl bg-orange-50 px-4 py-3.5 ring-1 ring-orange-100/60">
-                        <p class="text-sm text-orange-700 font-medium">Agent হলে লগইন করে এই Worker কে সরাসরি Job Offer পাঠান।</p>
+                        <p class="text-sm text-orange-700 font-medium">{{ __('messages.worker_profile.guest_agent_hint') }}</p>
                         <a href="{{ route('login') }}" class="text-sm font-bold text-orange-700 hover:text-orange-900 shrink-0 transition-colors">
-                            লগইন করুন →
+                            {{ __('messages.worker_profile.login') }} →
                         </a>
                     </div>
                 @endguest
@@ -91,17 +91,17 @@
                     @if ($worker->is_in_saudi)
                         <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-green-50 text-green-700 text-sm font-semibold ring-1 ring-green-100">
                             <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                            সৌদিতে আছেন
+                            {{ __('messages.worker_profile.in_saudi') }}
                         </span>
                     @else
                         <span class="inline-flex items-center px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 text-sm font-semibold ring-1 ring-slate-200">
-                            বাংলাদেশে আছেন
+                            {{ __('messages.worker_profile.in_bangladesh') }}
                         </span>
                     @endif
 
                     @if ($this->iqamaStatus)
                         <span class="inline-flex items-center px-3.5 py-1.5 rounded-full {{ $this->iqamaStatus['badgeClass'] }} text-sm font-semibold ring-1 ring-black/5">
-                            ইকামা: {{ $this->iqamaStatus['label'] }}
+                            {{ __('messages.worker_profile.iqama_label') }}: {{ $this->iqamaStatus['label'] }}
                         </span>
                     @endif
                 </div>
@@ -111,12 +111,12 @@
             <div class="border-t border-slate-100 px-6 sm:px-8 py-6">
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     @foreach ([
-                        ['label' => 'অভিজ্ঞতা', 'value' => $worker->experience_years . ' বছর', 'icon' => '🛠️'],
-                        ['label' => 'প্রত্যাশিত বেতন', 'value' => $worker->expected_salary_sar . ' SAR', 'icon' => '💰'],
-                        ['label' => 'বয়স', 'value' => ($worker->date_of_birth?->age ?? '—') . ' বছর', 'icon' => '🎂'],
-                        ['label' => 'আরবি দক্ষতা', 'value' => $worker->arabic_level, 'icon' => '🇸🇦'],
-                        ['label' => 'ইংরেজি দক্ষতা', 'value' => $worker->english_level, 'icon' => '🇬🇧'],
-                        ['label' => 'প্রোফাইল ভিউ', 'value' => $worker->view_count . ' বার', 'icon' => '👁️'],
+                        ['label' => __('messages.worker_profile.experience'), 'value' => $worker->experience_years . ' ' . __('messages.worker_profile.years'), 'icon' => '🛠️'],
+                        ['label' => __('messages.worker_profile.expected_salary'), 'value' => $worker->expected_salary_sar . ' SAR', 'icon' => '💰'],
+                        ['label' => __('messages.worker_profile.age'), 'value' => ($worker->date_of_birth?->age ?? '—') . ' ' . __('messages.worker_profile.years'), 'icon' => '🎂'],
+                        ['label' => __('messages.worker_profile.arabic_level'), 'value' => $worker->arabic_level, 'icon' => '🇸🇦'],
+                        ['label' => __('messages.worker_profile.english_level'), 'value' => $worker->english_level, 'icon' => '🇬🇧'],
+                        ['label' => __('messages.worker_profile.profile_views'), 'value' => $worker->view_count . ' ' . __('messages.worker_profile.times'), 'icon' => '👁️'],
                     ] as $stat)
                         <div class="rounded-2xl bg-slate-50 hover:bg-slate-100/80 transition-colors px-4 py-3.5 ring-1 ring-slate-100">
                             <p class="text-xs text-slate-400 mb-1 flex items-center gap-1">
@@ -131,7 +131,7 @@
             {{-- YouTube Video --}}
             @if ($this->youtubeEmbedUrl)
                 <div class="border-t border-slate-100 px-6 sm:px-8 py-6">
-                    <h2 class="text-lg font-bold text-slate-900 mb-3" style="font-family: 'Noto Serif Bengali', serif;">কাজের ভিডিও</h2>
+                    <h2 class="text-lg font-bold text-slate-900 mb-3" style="font-family: 'Noto Serif Bengali', serif;">{{ __('messages.worker_profile.work_video') }}</h2>
                     <div class="aspect-video rounded-2xl overflow-hidden bg-black shadow-inner ring-1 ring-slate-200">
                         <iframe src="{{ $this->youtubeEmbedUrl }}"
                                 class="w-full h-full"
@@ -144,15 +144,15 @@
             {{-- Contact Reveal Section --}}
             <div class="border-t border-slate-100 px-6 sm:px-8 py-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-bold text-slate-900" style="font-family: 'Noto Serif Bengali', serif;">যোগাযোগ তথ্য</h2>
-                    <span class="text-xs text-slate-400 bg-slate-50 px-2.5 py-1 rounded-full ring-1 ring-slate-100">প্রতি নম্বর ৫ SAR</span>
+                    <h2 class="text-lg font-bold text-slate-900" style="font-family: 'Noto Serif Bengali', serif;">{{ __('messages.worker_profile.contact_info') }}</h2>
+                    <span class="text-xs text-slate-400 bg-slate-50 px-2.5 py-1 rounded-full ring-1 ring-slate-100">{{ __('messages.worker_profile.per_number_fee') }}</span>
                 </div>
 
                 <div class="grid sm:grid-cols-2 gap-3">
                     @foreach ([
-                        'primary'  => ['label' => 'প্রাইমারি ফোন', 'icon' => '📞', 'value' => $worker->phone_primary],
-                        'whatsapp' => ['label' => 'WhatsApp নম্বর', 'icon' => '💬', 'value' => $worker->phone_whatsapp],
-                        'saudi'    => ['label' => 'সৌদি নম্বর', 'icon' => '🇸🇦', 'value' => $worker->phone_saudi],
+                        'primary'  => ['label' => __('messages.worker_profile.primary_phone'), 'icon' => '📞', 'value' => $worker->phone_primary],
+                        'whatsapp' => ['label' => __('messages.worker_profile.whatsapp_number'), 'icon' => '💬', 'value' => $worker->phone_whatsapp],
+                        'saudi'    => ['label' => __('messages.worker_profile.saudi_number'), 'icon' => '🇸🇦', 'value' => $worker->phone_saudi],
                     ] as $type => $item)
                         @if ($item['value'])
                             <div class="flex items-center justify-between rounded-2xl border border-slate-100 bg-white px-4 py-3.5 shadow-sm hover:shadow-md transition-shadow">
@@ -173,12 +173,12 @@
                                             wire:loading.attr="disabled"
                                             wire:target="revealPhone('{{ $type }}')"
                                             class="text-sm font-semibold text-white bg-emerald-800 hover:bg-emerald-900 active:scale-95 disabled:opacity-50 rounded-xl px-4 py-2 shrink-0 transition-all shadow-sm shadow-emerald-800/20">
-                                        <span wire:loading.remove wire:target="revealPhone('{{ $type }}')">দেখুন (৫ SAR)</span>
-                                        <span wire:loading wire:target="revealPhone('{{ $type }}')">অপেক্ষা করুন...</span>
+                                        <span wire:loading.remove wire:target="revealPhone('{{ $type }}')">{{ __('messages.worker_profile.view_fee') }}</span>
+                                        <span wire:loading wire:target="revealPhone('{{ $type }}')">{{ __('messages.worker_profile.please_wait') }}</span>
                                     </button>
                                 @else
                                     <span class="inline-flex items-center gap-1 text-green-600 text-sm font-semibold shrink-0 bg-green-50 px-2.5 py-1 rounded-lg">
-                                        ✓ দেখা হয়েছে
+                                        ✓ {{ __('messages.worker_profile.revealed') }}
                                     </span>
                                 @endunless
                             </div>
@@ -188,9 +188,9 @@
 
                 @guest
                     <div class="mt-4 flex items-center justify-between rounded-2xl bg-emerald-50 px-4 py-3.5 ring-1 ring-emerald-100">
-                        <p class="text-sm text-emerald-800 font-medium">নম্বর দেখতে অ্যাকাউন্টে লগইন করুন।</p>
+                        <p class="text-sm text-emerald-800 font-medium">{{ __('messages.worker_profile.guest_reveal_hint') }}</p>
                         <a href="{{ route('login') }}" class="text-sm font-bold text-emerald-800 hover:text-emerald-900 shrink-0 transition-colors">
-                            লগইন করুন →
+                            {{ __('messages.worker_profile.login') }} →
                         </a>
                     </div>
                 @endguest
@@ -204,12 +204,12 @@
                     <div class="flex items-center gap-2">
                         <span class="text-xl">👥</span>
                         <h2 class="text-xl font-bold text-slate-900" style="font-family: 'Noto Serif Bengali', serif;">
-                            অনুরূপ কর্মী (Similar Workers)
+                            {{ __('messages.worker_profile.similar_workers') }}
                         </h2>
                     </div>
                     {{-- Scroll Tip Indicator --}}
                     <span class="text-xs text-slate-400 flex items-center gap-1 animate-pulse">
-                        বামে স্ক্রোল করুন 
+                        {{ __('messages.worker_profile.scroll_left_tip') }}
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                         </svg>
@@ -232,7 +232,7 @@
                                              class="w-14 h-14 rounded-2xl object-cover shrink-0 ring-2 ring-slate-50 group-hover:ring-[#0B4F3F]/20 transition-all">
                                     @else
                                         <div class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 text-[11px] shrink-0 font-medium">
-                                            ছবি নেই
+                                            {{ __('messages.worker_profile.no_photo') }}
                                         </div>
                                     @endif
 
@@ -242,17 +242,17 @@
                                             {{ $simWorker->full_name_bn }}
                                         </h3>
                                         <p class="text-xs text-slate-400 truncate mt-0.5">
-                                            {{ $simWorker->skillCategory?->name_bn ?? 'সাধারণ কর্মী' }}
+                                            {{ $simWorker->skillCategory?->name_bn ?? __('messages.worker_profile.general_worker') }}
                                         </p>
                                         
                                         {{-- Experience & Location Status Badges --}}
                                         <div class="mt-2 flex flex-wrap gap-1">
                                             <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-slate-50 text-slate-500 ring-1 ring-slate-100">
-                                                {{ $simWorker->experience_years }} বছর
+                                                {{ $simWorker->experience_years }} {{ __('messages.worker_profile.years') }}
                                             </span>
                                             @if($simWorker->is_in_saudi)
                                                 <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-green-50 text-green-700 ring-1 ring-green-100">
-                                                    সৌদি
+                                                    {{ __('messages.worker_profile.saudi_badge') }}
                                                 </span>
                                             @endif
                                         </div>
@@ -262,11 +262,11 @@
                                 {{-- Expected Salary & CTA Area --}}
                                 <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
                                     <div class="text-left">
-                                        <span class="block text-[10px] text-slate-400 uppercase tracking-wider font-medium">বেতন</span>
+                                        <span class="block text-[10px] text-slate-400 uppercase tracking-wider font-medium">{{ __('messages.worker_profile.salary') }}</span>
                                         <span class="text-sm font-bold text-[#0B4F3F]">{{ floatval($simWorker->expected_salary_sar) }} SAR</span>
                                     </div>
                                     <span class="text-xs font-bold text-[#C9974C] group-hover:translate-x-1 transition-transform flex items-center gap-0.5">
-                                        প্রোফাইল →
+                                        {{ __('messages.worker_profile.view_profile') }}
                                     </span>
                                 </div>
                             </a>
@@ -285,7 +285,7 @@
             <div class="relative bg-white rounded-[28px] shadow-2xl ring-1 ring-slate-100 w-full max-w-lg overflow-hidden">
                 <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
                     <h3 class="text-lg font-bold text-slate-900">
-                        {{ $worker->full_name_bn }} কে Job Offer পাঠান
+                        {{ $worker->full_name_bn }} {{ __('messages.worker_profile.send_offer_to') }}
                     </h3>
                     <button wire:click="closeNokModal" class="text-slate-400 hover:text-slate-700 transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -303,11 +303,11 @@
 
                     @if ($this->agentActiveJobPosts->isEmpty())
                         <div class="rounded-2xl bg-slate-50 ring-1 ring-slate-100 px-4 py-6 text-center text-sm text-slate-500">
-                            আপনার কোনো Active Job Post নেই যেখানে vacancy খালি আছে।
+                            {{ __('messages.worker_profile.no_active_job_posts') }}
                         </div>
                     @else
                         <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-2">Job Post নির্বাচন করুন</label>
+                            <label class="block text-xs font-semibold text-slate-500 mb-2">{{ __('messages.worker_profile.select_job_post') }}</label>
                             <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
                                 @foreach ($this->agentActiveJobPosts as $job)
                                     <label class="flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 cursor-pointer transition-colors
@@ -334,10 +334,10 @@
                                                 'bg-slate-100 text-slate-500' => $job->nok_status === 'expired',
                                             ])>
                                                 @match($job->nok_status)
-                                                    'pending' => 'পাঠানো হয়েছে',
-                                                    'accepted' => 'গৃহীত',
-                                                    'rejected' => 'প্রত্যাখ্যাত',
-                                                    'expired' => 'মেয়াদোত্তীর্ণ',
+                                                    'pending' => __('messages.worker_profile.status_pending'),
+                                                    'accepted' => __('messages.worker_profile.status_accepted'),
+                                                    'rejected' => __('messages.worker_profile.status_rejected'),
+                                                    'expired' => __('messages.worker_profile.status_expired'),
                                                     default => '',
                                                 @endmatch
                                             </span>
@@ -348,11 +348,11 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-slate-500 mb-2">বার্তা (ঐচ্ছিক)</label>
+                            <label class="block text-xs font-semibold text-slate-500 mb-2">{{ __('messages.worker_profile.message_optional') }}</label>
                             <textarea wire:model="nokMessage"
                                       rows="3"
                                       maxlength="500"
-                                      placeholder="Worker কে সংক্ষেপে কিছু বলুন..."
+                                      placeholder="{{ __('messages.worker_profile.message_placeholder') }}"
                                       class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400"></textarea>
                         </div>
                     @endif
@@ -361,15 +361,15 @@
                 <div class="px-6 py-5 border-t border-slate-100 flex items-center justify-end gap-3">
                     <button wire:click="closeNokModal"
                             class="text-sm font-semibold text-slate-500 hover:text-slate-800 px-4 py-2.5 transition-colors">
-                        বাতিল
+                        {{ __('messages.worker_profile.cancel') }}
                     </button>
                     <button wire:click="sendNok"
                             wire:loading.attr="disabled"
                             wire:target="sendNok"
                             @disabled($this->agentActiveJobPosts->isEmpty())
                             class="text-sm font-bold text-white bg-orange-500 hover:bg-orange-600 active:scale-95 disabled:opacity-50 rounded-xl px-5 py-2.5 transition-all shadow-sm shadow-orange-500/30">
-                        <span wire:loading.remove wire:target="sendNok">পাঠান</span>
-                        <span wire:loading wire:target="sendNok">পাঠানো হচ্ছে...</span>
+                        <span wire:loading.remove wire:target="sendNok">{{ __('messages.worker_profile.send') }}</span>
+                        <span wire:loading wire:target="sendNok">{{ __('messages.worker_profile.sending') }}</span>
                     </button>
                 </div>
             </div>
