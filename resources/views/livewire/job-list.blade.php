@@ -5,9 +5,9 @@
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 tracking-tight" style="font-family: 'Noto Serif Bengali', serif;">
-                    জব লিস্ট
+                    {{ __('messages.jobs_page.title') }}
                 </h1>
-                <p class="text-sm text-gray-400 mt-0.5">Job Listings — সৌদি আরবের সকল সুযোগ এক জায়গায়</p>
+                <p class="text-sm text-gray-400 mt-0.5">{{ __('messages.jobs_page.subtitle') }}</p>
             </div>
 
             <button
@@ -20,7 +20,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
                 </svg>
-                নতুন করে দেখুন
+                {{ __('messages.jobs_page.refresh') }}
             </button>
         </div>
 
@@ -33,11 +33,11 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" style="color:#C9974C;" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
                         </svg>
-                        <h2 class="font-semibold text-gray-800 text-sm">ফিল্টার</h2>
+                        <h2 class="font-semibold text-gray-800 text-sm">{{ __('messages.jobs_page.filter') }}</h2>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1.5">পেশা / Skill</label>
+                        <label class="block text-xs font-medium text-gray-500 mb-1.5">{{ __('messages.jobs_page.skill') }}</label>
                         <select
                             wire:model.live="skillCategoryId"
                             class="w-full rounded-lg border-gray-200 text-sm text-gray-700"
@@ -45,7 +45,7 @@
                             onfocus="this.style.borderColor='#0B4F3F'"
                             onblur="this.style.borderColor='#e5e7eb'"
                         >
-                            <option value="">সব পেশা</option>
+                            <option value="">{{ __('messages.jobs_page.all_skills') }}</option>
                             @foreach ($skillCategories as $category)
                                 <option value="{{ $category->id }}">{{ $category->name_bn }}</option>
                             @endforeach
@@ -53,11 +53,11 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1.5">শহর / City</label>
+                        <label class="block text-xs font-medium text-gray-500 mb-1.5">{{ __('messages.jobs_page.city') }}</label>
                         <input
                             type="text"
                             wire:model.live.debounce.400ms="employerCity"
-                            placeholder="যেমন: Riyadh, Jeddah"
+                            placeholder="{{ __('messages.jobs_page.city_placeholder') }}"
                             class="w-full rounded-lg border-gray-200 text-sm placeholder:text-gray-300"
                             onfocus="this.style.borderColor='#0B4F3F'"
                             onblur="this.style.borderColor='#e5e7eb'"
@@ -65,12 +65,12 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1.5">বেতন সীমা (SAR)</label>
+                        <label class="block text-xs font-medium text-gray-500 mb-1.5">{{ __('messages.jobs_page.salary_range') }}</label>
                         <div class="grid grid-cols-2 gap-2">
                             <input
                                 type="number"
                                 wire:model.live.debounce.400ms="minSalary"
-                                placeholder="সর্বনিম্ন"
+                                placeholder="{{ __('messages.jobs_page.min_salary') }}"
                                 class="w-full rounded-lg border-gray-200 text-sm placeholder:text-gray-300"
                                 onfocus="this.style.borderColor='#0B4F3F'"
                                 onblur="this.style.borderColor='#e5e7eb'"
@@ -78,7 +78,7 @@
                             <input
                                 type="number"
                                 wire:model.live.debounce.400ms="maxSalary"
-                                placeholder="সর্বোচ্চ"
+                                placeholder="{{ __('messages.jobs_page.max_salary') }}"
                                 class="w-full rounded-lg border-gray-200 text-sm placeholder:text-gray-300"
                                 onfocus="this.style.borderColor='#0B4F3F'"
                                 onblur="this.style.borderColor='#e5e7eb'"
@@ -89,15 +89,15 @@
                     <div class="space-y-2.5 pt-1">
                         <label class="flex items-center gap-2.5 text-sm text-gray-600 cursor-pointer group">
                             <input type="checkbox" wire:model.live="accommodationOnly" class="rounded border-gray-300" style="accent-color:#0B4F3F;">
-                            <span class="group-hover:text-gray-900 transition">আবাসন সহ</span>
+                            <span class="group-hover:text-gray-900 transition">{{ __('messages.jobs_page.accommodation') }}</span>
                         </label>
                         <label class="flex items-center gap-2.5 text-sm text-gray-600 cursor-pointer group">
                             <input type="checkbox" wire:model.live="foodOnly" class="rounded border-gray-300" style="accent-color:#0B4F3F;">
-                            <span class="group-hover:text-gray-900 transition">খাবার সহ</span>
+                            <span class="group-hover:text-gray-900 transition">{{ __('messages.jobs_page.food') }}</span>
                         </label>
                         <label class="flex items-center gap-2.5 text-sm text-gray-600 cursor-pointer group">
                             <input type="checkbox" wire:model.live="transportOnly" class="rounded border-gray-300" style="accent-color:#0B4F3F;">
-                            <span class="group-hover:text-gray-900 transition">যানবাহন সহ</span>
+                            <span class="group-hover:text-gray-900 transition">{{ __('messages.jobs_page.transport') }}</span>
                         </label>
                     </div>
 
@@ -105,7 +105,7 @@
                         wire:click="resetFilters"
                         class="w-full text-sm font-medium py-2.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition"
                     >
-                        ফিল্টার রিসেট করুন
+                        {{ __('messages.jobs_page.reset_filters') }}
                     </button>
                 </div>
             </div>
@@ -149,20 +149,20 @@
                             </p>
 
                             <p class="text-sm text-gray-500 mb-3">
-                                বেতন
+                                {{ __('messages.jobs_page.salary_label') }}
                                 <span class="font-semibold text-gray-900 text-base ml-1">{{ number_format($job->salary_sar, 2) }}</span>
-                                <span class="text-xs text-gray-400">SAR / মাস</span>
+                                <span class="text-xs text-gray-400">{{ __('messages.jobs_page.per_month') }}</span>
                             </p>
 
                             <div class="flex flex-wrap gap-1.5 mb-4">
                                 @if ($job->accommodation)
-                                    <span class="text-[11px] font-medium bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full">আবাসন</span>
+                                    <span class="text-[11px] font-medium bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full">{{ __('messages.jobs_page.accommodation') }}</span>
                                 @endif
                                 @if ($job->food_included)
-                                    <span class="text-[11px] font-medium bg-green-50 text-green-600 px-2.5 py-1 rounded-full">খাবার</span>
+                                    <span class="text-[11px] font-medium bg-green-50 text-green-600 px-2.5 py-1 rounded-full">{{ __('messages.jobs_page.food') }}</span>
                                 @endif
                                 @if ($job->transport_provided)
-                                    <span class="text-[11px] font-medium bg-purple-50 text-purple-600 px-2.5 py-1 rounded-full">যানবাহন</span>
+                                    <span class="text-[11px] font-medium bg-purple-50 text-purple-600 px-2.5 py-1 rounded-full">{{ __('messages.jobs_page.transport') }}</span>
                                 @endif
                             </div>
 
@@ -178,7 +178,7 @@
                                     onmouseover="this.style.backgroundColor='#0e6350'"
                                     onmouseout="this.style.backgroundColor='#0B4F3F'"
                                 >
-                                    বিস্তারিত দেখুন
+                                    {{ __('messages.jobs_page.view_details') }}
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                                     </svg>
@@ -191,8 +191,8 @@
                                 <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" />
                                 <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
                             </svg>
-                            <p class="text-gray-400 text-sm">কোনো জব পাওয়া যায়নি।</p>
-                            <p class="text-gray-300 text-xs mt-1">ফিল্টার পরিবর্তন করে আবার চেষ্টা করুন।</p>
+                            <p class="text-gray-400 text-sm">{{ __('messages.jobs_page.no_jobs_found') }}</p>
+                            <p class="text-gray-300 text-xs mt-1">{{ __('messages.jobs_page.try_different_filter') }}</p>
                         </div>
                     @endforelse
                 </div>

@@ -165,4 +165,27 @@ return [
         'sending' => 'جارٍ الإرسال...',
     ],
 
+    'jobs_page' => [
+        'title' => 'قائمة الوظائف',
+        'subtitle' => 'قائمة الوظائف — جميع الفرص في السعودية في مكان واحد',
+        'refresh' => 'تحديث',
+        'filter' => 'الفلتر',
+        'skill' => 'المهنة',
+        'all_skills' => 'كل المهن',
+        'city' => 'المدينة',
+        'city_placeholder' => 'مثال: الرياض، جدة',
+        'salary_range' => 'نطاق الراتب (ريال)',
+        'min_salary' => 'الحد الأدنى',
+        'max_salary' => 'الحد الأقصى',
+        'accommodation' => 'مع سكن',
+        'food' => 'مع طعام',
+        'transport' => 'مع مواصلات',
+        'reset_filters' => 'إعادة تعيين الفلاتر',
+        'salary_label' => 'الراتب',
+        'per_month' => 'ريال / شهر',
+        'view_details' => 'عرض التفاصيل',
+        'no_jobs_found' => 'لم يتم العثور على وظائف.',
+        'try_different_filter' => 'حاول تغيير الفلاتر والبحث مرة أخرى.',
+    ],
+
 ];
