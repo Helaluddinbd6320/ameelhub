@@ -22,7 +22,7 @@ return [
     ],
 
 
-    
+
     'nav' => [
         'home' => 'الرئيسية',
         'workers' => 'العمال',
@@ -92,5 +92,27 @@ return [
             'my_noks' => 'عروضي',
             'my_selections' => 'اختياراتي',
         ],
+
+        'workers_page' => [
+        'title' => 'قائمة العمال',
+        'all_skills' => 'كل المهن',
+        'all_visa_status' => 'كل حالات التأشيرة',
+        'visa_visit' => 'زيارة',
+        'visa_iqama' => 'إقامة',
+        'visa_free_exit' => 'خروج مجاني',
+        'visa_final_exit' => 'خروج نهائي',
+        'visa_new_visa' => 'تأشيرة جديدة',
+        'visa_not_in_saudi' => 'ليس في السعودية',
+        'all_locations' => 'كل المواقع',
+        'in_saudi' => 'موجود في السعودية',
+        'in_bangladesh' => 'موجود في بنغلاديش',
+        'reset_filters' => 'إعادة تعيين الفلاتر',
+        'no_photo' => 'لا توجد صورة',
+        'featured' => 'مميز',
+        'no_workers_found' => 'لم يتم العثور على عمال.',
+        'reset_and_view_again' => 'أعد تعيين الفلاتر وحاول مرة أخرى',
+    ],
+
+    
     ],
 ];

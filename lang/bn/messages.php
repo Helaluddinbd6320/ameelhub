@@ -89,5 +89,27 @@ return [
             'my_noks' => 'আমার Nok সমূহ',
             'my_selections' => 'আমার Selection সমূহ',
         ],
+
+
+        'workers_page' => [
+        'title' => 'কর্মীদের তালিকা',
+        'all_skills' => 'সব পেশা',
+        'all_visa_status' => 'সব ভিসা স্ট্যাটাস',
+        'visa_visit' => 'ভিজিট',
+        'visa_iqama' => 'ইকামা',
+        'visa_free_exit' => 'ফ্রি এক্সিট',
+        'visa_final_exit' => 'ফাইনাল এক্সিট',
+        'visa_new_visa' => 'নতুন ভিসা',
+        'visa_not_in_saudi' => 'সৌদিতে নেই',
+        'all_locations' => 'সব অবস্থান',
+        'in_saudi' => 'সৌদিতে আছেন',
+        'in_bangladesh' => 'বাংলাদেশে আছেন',
+        'reset_filters' => 'ফিল্টার রিসেট করুন',
+        'no_photo' => 'ছবি নেই',
+        'featured' => 'ফিচারড',
+        'no_workers_found' => 'কোনো কর্মী পাওয়া যায়নি।',
+        'reset_and_view_again' => 'ফিল্টার রিসেট করে আবার দেখুন',
+    ],
+    
     ],
 ];

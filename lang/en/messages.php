@@ -20,7 +20,7 @@ return [
         'vacancies_left' => 'vacancies left',
     ],
 
-    
+
     'nav' => [
         'home' => 'Home',
         'workers' => 'Workers',
@@ -91,5 +91,28 @@ return [
             'my_noks' => 'My Noks',
             'my_selections' => 'My Selections',
         ],
+
+
+        'workers_page' => [
+        'title' => 'Workers List',
+        'all_skills' => 'All Skills',
+        'all_visa_status' => 'All Visa Status',
+        'visa_visit' => 'Visit',
+        'visa_iqama' => 'Iqama',
+        'visa_free_exit' => 'Free Exit',
+        'visa_final_exit' => 'Final Exit',
+        'visa_new_visa' => 'New Visa',
+        'visa_not_in_saudi' => 'Not in Saudi',
+        'all_locations' => 'All Locations',
+        'in_saudi' => 'In Saudi Arabia',
+        'in_bangladesh' => 'In Bangladesh',
+        'reset_filters' => 'Reset Filters',
+        'no_photo' => 'No Photo',
+        'featured' => 'Featured',
+        'no_workers_found' => 'No workers found.',
+        'reset_and_view_again' => 'Reset filters and try again',
+    ],
+
+    
     ],
 ];
