@@ -32,14 +32,14 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
                 fn(): string => Blade::render(
-                    '<div class="hidden md:block">@livewire(\'notification-bell\', key: \'bell-desktop\')</div>'
+                    '<div class="hidden md:block"><livewire:notification-bell key="bell-desktop" /></div>'
                 ),
             )
             // মোবাইলে বেল আইকন সার্চের পরে দেখাবে
             ->renderHook(
                 PanelsRenderHook::GLOBAL_SEARCH_AFTER,
                 fn(): string => Blade::render(
-                    '<div class="block md:hidden">@livewire(\'notification-bell\', key: \'bell-mobile\')</div>'
+                    '<div class="block md:hidden"><livewire:notification-bell key="bell-mobile" /></div>'
                 ),
             )
             ->id('admin')
