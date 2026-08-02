@@ -2,10 +2,10 @@
     {{-- Header / Description --}}
     <div class="mb-6 text-center">
         <h1 class="text-xl font-bold text-white mb-2" style="font-family: 'Noto Serif Bengali', serif;">
-            পাসওয়ার্ড রিসেট করুন
+            {{ __('messages.forgot_password.title') }}
         </h1>
         <p class="text-xs text-white/60 leading-relaxed max-w-sm mx-auto">
-            আপনার অ্যাকাউন্টের ইমেইল ঠিকানাটি লিখুন। আমরা আপনাকে একটি পাসওয়ার্ড রিসেট লিঙ্ক পাঠাবো, যার মাধ্যমে নতুন পাসওয়ার্ড সেট করতে পারবেন।
+            {{ __('messages.forgot_password.description') }}
         </p>
     </div>
 
@@ -22,7 +22,7 @@
 
         {{-- Email Address --}}
         <div>
-            <label for="email" class="block text-xs font-medium text-white/70 mb-1.5">ইমেইল ঠিকানা</label>
+            <label for="email" class="block text-xs font-medium text-white/70 mb-1.5">{{ __('messages.forgot_password.email') }}</label>
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <svg class="h-4 w-4 text-white/40" viewBox="0 0 20 20" fill="currentColor">
@@ -48,7 +48,7 @@
                 style="background-color:#C9974C; color:#0B4F3F;"
                 onmouseover="this.style.backgroundColor='#dbab5e'"
                 onmouseout="this.style.backgroundColor='#C9974C'">
-            রিসেট লিঙ্ক পাঠান
+            {{ __('messages.forgot_password.send_reset_link') }}
         </button>
 
         {{-- Back to Login --}}
@@ -57,7 +57,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
-                লগইন পেজে ফিরে যান
+                {{ __('messages.forgot_password.back_to_login') }}
             </a>
         </p>
     </form>

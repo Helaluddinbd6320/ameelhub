@@ -17,10 +17,10 @@
                 'bg-success-100 text-success-800 dark:bg-success-900 dark:text-success-200' => $result['status'] === 'success',
                 'bg-danger-100 text-danger-800 dark:bg-danger-900 dark:text-danger-200' => $result['status'] === 'failed',
             ])>
-                {{ $result['status'] === 'success' ? 'পাঠানো হয়েছে' : 'ব্যর্থ হয়েছে' }}
+                {{ $result['status'] === 'success' ? __('messages.bulk_result.success') : __('messages.bulk_result.failed') }}
             </span>
         </div>
     @empty
-        <p class="text-gray-500 dark:text-gray-400">কোনো ফলাফল নেই।</p>
+        <p class="text-gray-500 dark:text-gray-400">{{ __('messages.bulk_result.no_results') }}</p>
     @endforelse
 </div>

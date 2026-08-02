@@ -1,7 +1,7 @@
 <div>
     <div class="rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10 p-6">
         <h3 class="text-base font-semibold text-gray-950 dark:text-white mb-4">
-            আপনার জন্য সেরা Job
+            {{ __('messages.recommended_jobs.heading') }}
         </h3>
 
         @php
@@ -10,7 +10,7 @@
 
         @if (count($jobs) === 0)
             <p class="text-sm text-gray-500 dark:text-gray-400">
-                এই মুহূর্তে আপনার প্রোফাইলের সাথে মিলে এমন কোনো Job পাওয়া যায়নি। আপনার CV সম্পূর্ণ থাকলে আরও ভালো ফলাফল পাবেন।
+                {{ __('messages.recommended_jobs.empty') }}
             </p>
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -36,7 +36,7 @@
                     >
                         <div>
                             <span class="inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold {{ $badgeClasses }}">
-                                {{ $total }}% match
+                                {{ __('messages.recommended_jobs.match_percentage', ['percent' => $total]) }}
                             </span>
                         </div>
 

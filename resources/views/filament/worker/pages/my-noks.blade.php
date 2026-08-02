@@ -2,10 +2,10 @@
     {{-- Tabs --}}
     <div class="flex flex-wrap gap-2 mb-6">
         @foreach ([
-            'pending'  => 'অপেক্ষমান',
-            'accepted' => 'গৃহীত',
-            'rejected' => 'প্রত্যাখ্যাত',
-            'expired'  => 'মেয়াদোত্তীর্ণ',
+            'pending'  => __('messages.nok_page.status_pending'),
+            'accepted' => __('messages.nok_page.status_accepted'),
+            'rejected' => __('messages.nok_page.status_rejected'),
+            'expired'  => __('messages.nok_page.status_expired'),
         ] as $status => $label)
             <button
                 type="button"
@@ -27,7 +27,7 @@
             <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-900 shadow-sm">
                 <div class="flex items-start justify-between mb-2">
                     <h3 class="font-semibold text-gray-900 dark:text-gray-100">
-                        {{ $nok->jobPost?->job_title ?? 'Job মুছে ফেলা হয়েছে' }}
+                        {{ $nok->jobPost?->job_title ?? __('messages.nok_page.job_deleted') }}
                     </h3>
                     <span @class([
                         'text-xs px-2 py-1 rounded-full font-medium',
@@ -37,19 +37,19 @@
                         'bg-gray-200 text-gray-600' => $nok->status === 'expired',
                     ])>
                         {{ match($nok->status) {
-                            'pending' => 'অপেক্ষমান',
-                            'accepted' => 'গৃহীত',
-                            'rejected' => 'প্রত্যাখ্যাত',
-                            'expired' => 'মেয়াদোত্তীর্ণ',
+                            'pending' => __('messages.nok_page.status_pending'),
+                            'accepted' => __('messages.nok_page.status_accepted'),
+                            'rejected' => __('messages.nok_page.status_rejected'),
+                            'expired' => __('messages.nok_page.status_expired'),
                         } }}
                     </span>
                 </div>
 
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                    নিয়োগকর্তা: {{ $nok->jobPost?->employer_name ?? '—' }} ({{ $nok->jobPost?->employer_city ?? '—' }})
+                    {{ __('messages.nok_page.employer_label') }}: {{ $nok->jobPost?->employer_name ?? '—' }} ({{ $nok->jobPost?->employer_city ?? '—' }})
                 </p>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                    Agent: {{ $nok->agent?->name ?? 'অজানা' }}
+                    {{ __('messages.nok_page.agent_label') }}: {{ $nok->agent?->name ?? __('messages.nok_page.unknown') }}
                 </p>
 
                 @if ($nok->nok_message)
@@ -59,11 +59,11 @@
                 @endif
 
                 <div class="text-xs text-gray-400 mt-3 space-y-0.5">
-                    <p>পাঠানো হয়েছে: {{ $nok->sent_at->translatedFormat('d M Y, h:i A') }}</p>
+                    <p>{{ __('messages.nok_page.sent_at') }}: {{ $nok->sent_at->translatedFormat('d M Y, h:i A') }}</p>
                     @if ($nok->status === 'pending')
-                        <p>মেয়াদ শেষ: {{ $nok->expires_at->translatedFormat('d M Y, h:i A') }}</p>
+                        <p>{{ __('messages.nok_page.expires_at') }}: {{ $nok->expires_at->translatedFormat('d M Y, h:i A') }}</p>
                     @elseif ($nok->responded_at)
-                        <p>উত্তর দেওয়া হয়েছে: {{ $nok->responded_at->translatedFormat('d M Y, h:i A') }}</p>
+                        <p>{{ __('messages.nok_page.responded_at') }}: {{ $nok->responded_at->translatedFormat('d M Y, h:i A') }}</p>
                     @endif
                 </div>
 
@@ -72,25 +72,25 @@
                         <button
                             type="button"
                             wire:click="acceptNok({{ $nok->id }})"
-                            wire:confirm="আপনি কি এই Job Offer গ্রহণ করতে চান?"
+                            wire:confirm="{{ __('messages.nok_page.confirm_accept') }}"
                             class="flex-1 px-3 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium"
                         >
-                            গ্রহণ করুন
+                            {{ __('messages.nok_page.accept') }}
                         </button>
                         <button
                             type="button"
                             wire:click="rejectNok({{ $nok->id }})"
-                            wire:confirm="আপনি কি এই Job Offer প্রত্যাখ্যান করতে চান?"
+                            wire:confirm="{{ __('messages.nok_page.confirm_reject') }}"
                             class="flex-1 px-3 py-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 text-sm font-medium"
                         >
-                            প্রত্যাখ্যান করুন
+                            {{ __('messages.nok_page.reject') }}
                         </button>
                     </div>
                 @endif
             </div>
         @empty
             <div class="col-span-full text-center py-12 text-gray-400">
-                এই ক্যাটাগরিতে কোনো Nok নেই।
+                {{ __('messages.nok_page.no_noks_in_category') }}
             </div>
         @endforelse
     </div>

@@ -2,9 +2,9 @@
     {{-- Header --}}
     <div class="mb-6 text-center">
         <h1 class="text-xl font-bold text-white" style="font-family: 'Noto Serif Bengali', serif;">
-            নতুন পাসওয়ার্ড সেট করুন
+            {{ __('messages.reset_password.title') }}
         </h1>
-        <p class="text-xs text-white/50 mt-1">আপনার নতুন নিরাপদ পাসওয়ার্ডটি এখানে লিখুন</p>
+        <p class="text-xs text-white/50 mt-1">{{ __('messages.reset_password.subtitle') }}</p>
     </div>
 
     <form method="POST" action="{{ route('password.store') }}" class="space-y-4">
@@ -15,7 +15,7 @@
 
         <!-- Email Address -->
         <div>
-            <label for="email" class="block text-xs font-medium text-white/70 mb-1.5">ইমেইল ঠিকানা</label>
+            <label for="email" class="block text-xs font-medium text-white/70 mb-1.5">{{ __('messages.reset_password.email') }}</label>
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <svg class="h-4 w-4 text-white/40" viewBox="0 0 20 20" fill="currentColor">
@@ -37,7 +37,7 @@
 
         <!-- Password -->
         <div>
-            <label for="password" class="block text-xs font-medium text-white/70 mb-1.5">নতুন পাসওয়ার্ড</label>
+            <label for="password" class="block text-xs font-medium text-white/70 mb-1.5">{{ __('messages.reset_password.new_password') }}</label>
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <svg class="h-4 w-4 text-white/40" viewBox="0 0 20 20" fill="currentColor">
@@ -58,7 +58,7 @@
 
         <!-- Confirm Password -->
         <div>
-            <label for="password_confirmation" class="block text-xs font-medium text-white/70 mb-1.5">পাসওয়ার্ড নিশ্চিত করুন</label>
+            <label for="password_confirmation" class="block text-xs font-medium text-white/70 mb-1.5">{{ __('messages.reset_password.confirm_password') }}</label>
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <svg class="h-4 w-4 text-white/40" viewBox="0 0 20 20" fill="currentColor">
@@ -83,7 +83,7 @@
                 style="background-color:#C9974C; color:#0B4F3F;"
                 onmouseover="this.style.backgroundColor='#dbab5e'"
                 onmouseout="this.style.backgroundColor='#C9974C'">
-            পাসওয়ার্ড রিসেট করুন
+            {{ __('messages.reset_password.reset_button') }}
         </button>
     </form>
 </x-guest-layout>

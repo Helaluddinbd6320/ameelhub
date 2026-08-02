@@ -10,10 +10,10 @@
 
     <div class="mb-6 text-center">
         <h1 class="text-xl font-bold text-white mb-2" style="font-family: 'Noto Serif Bengali', serif;">
-            পাসওয়ার্ড নিশ্চিত করুন
+            {{ __('messages.confirm_password.title') }}
         </h1>
         <p class="text-xs text-white/60 leading-relaxed max-w-sm mx-auto">
-            এটি অ্যাপ্লিকেশনের একটি সুরক্ষিত এলাকা। সামনে এগিয়ে যাওয়ার আগে অনুগ্রহ করে আপনার পাসওয়ার্ডটি নিশ্চিত করুন।
+            {{ __('messages.confirm_password.description') }}
         </p>
     </div>
 
@@ -22,7 +22,7 @@
 
         {{-- Password --}}
         <div>
-            <label for="password" class="block text-xs font-medium text-white/70 mb-1.5">পাসওয়ার্ড</label>
+            <label for="password" class="block text-xs font-medium text-white/70 mb-1.5">{{ __('messages.confirm_password.password') }}</label>
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <svg class="h-4 w-4 text-white/40" viewBox="0 0 20 20" fill="currentColor">
@@ -47,7 +47,7 @@
                 style="background-color:#C9974C; color:#0B4F3F;"
                 onmouseover="this.style.backgroundColor='#dbab5e'"
                 onmouseout="this.style.backgroundColor='#C9974C'">
-            নিশ্চিত করুন
+            {{ __('messages.confirm_password.confirm') }}
         </button>
     </form>
 </x-guest-layout>

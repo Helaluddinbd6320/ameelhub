@@ -2,9 +2,9 @@
     {{-- Header --}}
     <div class="mb-6 text-center">
         <h1 class="text-xl font-bold text-white" style="font-family: 'Noto Serif Bengali', serif;">
-            নতুন একাউন্ট তৈরি করুন
+            {{ __('messages.register.title') }}
         </h1>
-        <p class="text-xs text-white/50 mt-1">নিরাপদ, লাইসেন্সপ্রাপ্ত প্ল্যাটফর্মে যোগ দিন</p>
+        <p class="text-xs text-white/50 mt-1">{{ __('messages.register.subtitle') }}</p>
     </div>
 
     <form method="POST" action="{{ route('register') }}" class="space-y-4">
@@ -16,7 +16,7 @@
         @if (old('ref', $referralCode ?? null))
             <div class="rounded-xl px-4 py-2.5 text-xs text-center border" 
                  style="background-color:rgba(16,185,129,0.12); color:#a7f3d0; border-color:rgba(16,185,129,0.3);">
-                ✓ রেফারেল কোড প্রয়োগ হয়েছে — রেজিস্ট্রেশন সম্পন্ন হলে আপনার পরিচিতজন বোনাস পাবেন।
+                {{ __('messages.register.referral_applied') }}
             </div>
         @endif
 
@@ -36,7 +36,7 @@
 
         <!-- Name -->
         <div>
-            <label for="name" class="block text-xs font-medium text-white/70 mb-1.5">নাম (Name)</label>
+            <label for="name" class="block text-xs font-medium text-white/70 mb-1.5">{{ __('messages.register.name') }}</label>
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <svg class="h-4 w-4 text-white/40" viewBox="0 0 20 20" fill="currentColor">
@@ -46,7 +46,7 @@
                 <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name"
                        class="w-full rounded-2xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-white/35 outline-none transition-colors"
                        style="background-color:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.25);"
-                       placeholder="আপনার পুরো নাম লিখুন"
+                       placeholder="{{ __('messages.register.name_placeholder') }}"
                        onfocus="this.style.borderColor='#C9974C'; this.style.backgroundColor='rgba(255,255,255,0.1)'"
                        onblur="this.style.borderColor='rgba(255,255,255,0.25)'; this.style.backgroundColor='rgba(255,255,255,0.06)'">
             </div>
@@ -57,7 +57,7 @@
 
         <!-- Email -->
         <div>
-            <label for="email" class="block text-xs font-medium text-white/70 mb-1.5">ইমেইল (Email)</label>
+            <label for="email" class="block text-xs font-medium text-white/70 mb-1.5">{{ __('messages.register.email') }}</label>
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <svg class="h-4 w-4 text-white/40" viewBox="0 0 20 20" fill="currentColor">
@@ -79,7 +79,7 @@
 
         <!-- Role Selection -->
         <div>
-            <label class="block text-xs font-medium text-white/70 mb-1.5">আমি কে? / I am a</label>
+            <label class="block text-xs font-medium text-white/70 mb-1.5">{{ __('messages.register.i_am_a') }}</label>
             <div class="flex gap-3">
                 {{-- Worker Card --}}
                 <label id="label-worker" class="flex-1 flex items-center gap-2 cursor-pointer rounded-2xl border px-3.5 py-3 transition-all"
@@ -88,7 +88,7 @@
                         {{ old('role', 'worker') === 'worker' ? 'checked' : '' }}
                         style="accent-color:#C9974C;"
                         onchange="updateRoles('worker')"/>
-                    <span class="text-xs font-medium text-white">🧑‍🔧 কর্মী (Worker)</span>
+                    <span class="text-xs font-medium text-white">{{ __('messages.register.worker') }}</span>
                 </label>
                 
                 {{-- Agent Card --}}
@@ -98,7 +98,7 @@
                         {{ old('role') === 'agent' ? 'checked' : '' }}
                         style="accent-color:#C9974C;"
                         onchange="updateRoles('agent')"/>
-                    <span class="text-xs font-medium text-white">🤝 এজেন্ট (Agent)</span>
+                    <span class="text-xs font-medium text-white">{{ __('messages.register.agent') }}</span>
                 </label>
             </div>
             @error('role')
@@ -108,7 +108,7 @@
 
         <!-- Password -->
         <div>
-            <label for="password" class="block text-xs font-medium text-white/70 mb-1.5">পাসওয়ার্ড (Password)</label>
+            <label for="password" class="block text-xs font-medium text-white/70 mb-1.5">{{ __('messages.register.password') }}</label>
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <svg class="h-4 w-4 text-white/40" viewBox="0 0 20 20" fill="currentColor">
@@ -129,7 +129,7 @@
 
         <!-- Confirm Password -->
         <div>
-            <label for="password_confirmation" class="block text-xs font-medium text-white/70 mb-1.5">পাসওয়ার্ড নিশ্চিত করুন</label>
+            <label for="password_confirmation" class="block text-xs font-medium text-white/70 mb-1.5">{{ __('messages.register.confirm_password') }}</label>
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <svg class="h-4 w-4 text-white/40" viewBox="0 0 20 20" fill="currentColor">
@@ -154,7 +154,7 @@
                 style="background-color:#C9974C; color:#0B4F3F;"
                 onmouseover="this.style.backgroundColor='#dbab5e'"
                 onmouseout="this.style.backgroundColor='#C9974C'">
-            রেজিস্ট্রেশন করুন
+            {{ __('messages.register.register_button') }}
         </button>
 
         {{-- Social Login --}}
@@ -164,7 +164,7 @@
                     <div class="w-full border-t" style="border-color:rgba(255,255,255,0.15);"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="px-3 text-white/40" style="background-color:transparent;">অথবা</span>
+                    <span class="px-3 text-white/40" style="background-color:transparent;">{{ __('messages.register.or') }}</span>
                 </div>
             </div>
             <div class="mt-4 flex flex-col gap-2.5">
@@ -190,7 +190,7 @@
                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                     </svg>
-                    Google দিয়ে রেজিস্ট্রেশন
+                    {{ __('messages.register.register_with_google') }}
                 </a>
                 <a id="social-facebook" href="{{ route('social.redirect', 'facebook') }}"
                     data-base-url="{{ route('social.redirect', 'facebook') }}"
@@ -199,14 +199,14 @@
                     <svg class="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
                         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                     </svg>
-                    Facebook দিয়ে রেজিস্ট্রেশন
+                    {{ __('messages.register.register_with_facebook') }}
                 </a>
             </div>
         </div>
 
         {{-- Footer Link --}}
         <p class="text-center text-sm text-white/50 pt-2">
-            ইতিমধ্যেই রেজিস্টার্ড? <a href="{{ route('login') }}" class="font-semibold hover:underline" style="color:#C9974C;">লগইন করুন</a>
+            {{ __('messages.register.already_registered') }} <a href="{{ route('login') }}" class="font-semibold hover:underline" style="color:#C9974C;">{{ __('messages.register.login_now') }}</a>
         </p>
     </form>
 

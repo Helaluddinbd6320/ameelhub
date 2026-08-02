@@ -1,10 +1,10 @@
 <x-filament-panels::page>
     <div class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
         <p class="text-sm font-medium text-gray-700 dark:text-gray-200">
-            Job: {{ $this->record->job_title }} — {{ $this->record->employer_name }}
+            {{ __('messages.bulk_nok_page.job_label') }}: {{ $this->record->job_title }} — {{ $this->record->employer_name }}
         </p>
         <p class="text-xs text-gray-500 dark:text-gray-400">
-            ভ্যাকান্সি: {{ $this->record->filled_count }}/{{ $this->record->vacancies }}
+            {{ __('messages.bulk_nok_page.vacancies') }}: {{ $this->record->filled_count }}/{{ $this->record->vacancies }}
         </p>
     </div>
 
@@ -18,7 +18,7 @@
             <div class="w-full max-w-lg rounded-xl bg-white shadow-xl dark:bg-gray-900">
                 <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-700">
                     <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100">
-                        Bulk Nok ফলাফল — {{ $this->getBulkNokSuccessCount() }} জন সফল, {{ $this->getBulkNokFailedCount() }} জন ব্যর্থ
+                        {{ __('messages.bulk_nok_page.result_title', ['success' => $this->getBulkNokSuccessCount(), 'failed' => $this->getBulkNokFailedCount()]) }}
                     </h2>
                     <button
                         type="button"
@@ -51,11 +51,11 @@
                                     'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' => $result['status'] === 'success',
                                     'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' => $result['status'] === 'failed',
                                 ])>
-                                    {{ $result['status'] === 'success' ? 'পাঠানো হয়েছে' : 'ব্যর্থ হয়েছে' }}
+                                    {{ $result['status'] === 'success' ? __('messages.bulk_result.success') : __('messages.bulk_result.failed') }}
                                 </span>
                             </div>
                         @empty
-                            <p class="text-gray-500 dark:text-gray-400">কোনো ফলাফল নেই।</p>
+                            <p class="text-gray-500 dark:text-gray-400">{{ __('messages.bulk_result.no_results') }}</p>
                         @endforelse
                     </div>
                 </div>
@@ -66,7 +66,7 @@
                         wire:click="closeBulkNokResultModal"
                         class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
                     >
-                        বন্ধ করুন
+                        {{ __('messages.bulk_nok_page.close') }}
                     </button>
                 </div>
             </div>

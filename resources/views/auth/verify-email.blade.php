@@ -9,10 +9,10 @@
 
     <div class="mb-6 text-center">
         <h1 class="text-xl font-bold text-white mb-2" style="font-family: 'Noto Serif Bengali', serif;">
-            ইমেইল ভেরিফিকেশন
+            {{ __('messages.verify_email.title') }}
         </h1>
         <p class="text-xs text-white/60 leading-relaxed max-w-sm mx-auto">
-            নিবন্ধন করার জন্য ধন্যবাদ! শুরু করার আগে, আমরা আপনার ইমেইলে একটি ভেরিফিকেশন লিঙ্ক পাঠিয়েছি, সেটি ক্লিক করে অ্যাকাউন্টটি সচল করুন। যদি লিঙ্কটি না পেয়ে থাকেন, তবে নিচের বাটনে ক্লিক করে আবার পাঠাতে পারেন।
+            {{ __('messages.verify_email.description') }}
         </p>
     </div>
 
@@ -20,7 +20,7 @@
     @if (session('status') == 'verification-link-sent')
         <div class="mb-5 rounded-xl px-4 py-2.5 text-xs text-center border" 
              style="background-color:rgba(16,185,129,0.12); color:#a7f3d0; border-color:rgba(16,185,129,0.3);">
-            ✓ রেজিস্ট্রেশনের সময় দেওয়া আপনার ইমেইল ঠিকানায় একটি নতুন ভেরিফিকেশন লিঙ্ক পাঠানো হয়েছে।
+            {{ __('messages.verify_email.link_resent') }}
         </div>
     @endif
 
@@ -33,7 +33,7 @@
                     style="background-color:#C9974C; color:#0B4F3F;"
                     onmouseover="this.style.backgroundColor='#dbab5e'"
                     onmouseout="this.style.backgroundColor='#C9974C'">
-                ভেরিফিকেশন ইমেইল আবার পাঠান
+                {{ __('messages.verify_email.resend_button') }}
             </button>
         </form>
 
@@ -41,7 +41,7 @@
         <form method="POST" action="{{ route('logout') }}" class="text-center">
             @csrf
             <button type="submit" class="text-sm text-white/50 hover:text-white underline transition-colors focus:outline-none">
-                লগ আউট করুন
+                {{ __('messages.verify_email.logout') }}
             </button>
         </form>
     </div>

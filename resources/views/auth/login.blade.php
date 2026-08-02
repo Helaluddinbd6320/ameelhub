@@ -9,7 +9,7 @@
     </div>
 
     <h1 class="text-center text-lg font-bold text-white mb-6" style="font-family: 'Noto Serif Bengali', serif;">
-        আপনার একাউন্টে লগইন করুন
+        {{ __('messages.login.title') }}
     </h1>
 
     {{-- Session Status --}}
@@ -24,7 +24,7 @@
 
         {{-- Email --}}
         <div>
-            <label for="email" class="block text-xs font-medium text-white/70 mb-1.5">ইমেইল</label>
+            <label for="email" class="block text-xs font-medium text-white/70 mb-1.5">{{ __('messages.login.email') }}</label>
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <svg class="h-4 w-4 text-white/40" viewBox="0 0 20 20" fill="currentColor">
@@ -46,7 +46,7 @@
 
         {{-- Password --}}
         <div>
-            <label for="password" class="block text-xs font-medium text-white/70 mb-1.5">পাসওয়ার্ড</label>
+            <label for="password" class="block text-xs font-medium text-white/70 mb-1.5">{{ __('messages.login.password') }}</label>
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <svg class="h-4 w-4 text-white/40" viewBox="0 0 20 20" fill="currentColor">
@@ -69,12 +69,12 @@
         <div class="flex items-center justify-between pt-1">
             <label for="remember_me" class="inline-flex items-center gap-2 cursor-pointer">
                 <input id="remember_me" type="checkbox" name="remember" style="accent-color:#C9974C;">
-                <span class="text-sm text-white/70">মনে রাখুন</span>
+                <span class="text-sm text-white/70">{{ __('messages.login.remember_me') }}</span>
             </label>
 
             @if (Route::has('password.request'))
                 <a class="text-sm text-white/60 hover:text-white underline transition-colors" href="{{ route('password.request') }}">
-                    পাসওয়ার্ড ভুলে গেছেন?
+                    {{ __('messages.login.forgot_password') }}
                 </a>
             @endif
         </div>
@@ -85,7 +85,7 @@
                 style="background-color:#C9974C; color:#0B4F3F;"
                 onmouseover="this.style.backgroundColor='#dbab5e'"
                 onmouseout="this.style.backgroundColor='#C9974C'">
-            লগইন করুন
+            {{ __('messages.login.login_button') }}
         </button>
 
         {{-- Social Login --}}
@@ -95,7 +95,7 @@
                     <div class="w-full border-t" style="border-color:rgba(255,255,255,0.15);"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="px-3 text-white/40" style="background-color:transparent;">অথবা</span>
+                    <span class="px-3 text-white/40" style="background-color:transparent;">{{ __('messages.login.or') }}</span>
                 </div>
             </div>
             <div class="mt-4 flex flex-col gap-2.5">
@@ -108,7 +108,7 @@
                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                     </svg>
-                    Google দিয়ে লগইন
+                    {{ __('messages.login.login_with_google') }}
                 </a>
                 <a href="{{ route('social.redirect', 'facebook') }}"
                     class="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-2xl text-sm font-medium transition-colors"
@@ -116,13 +116,13 @@
                     <svg class="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
                         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                     </svg>
-                    Facebook দিয়ে লগইন
+                    {{ __('messages.login.login_with_facebook') }}
                 </a>
             </div>
         </div>
 
         <p class="text-center text-sm text-white/50 pt-2">
-            একাউন্ট নেই? <a href="{{ route('register') }}" class="font-semibold hover:underline" style="color:#C9974C;">রেজিস্ট্রেশন করুন</a>
+            {{ __('messages.login.no_account') }} <a href="{{ route('register') }}" class="font-semibold hover:underline" style="color:#C9974C;">{{ __('messages.login.register_now') }}</a>
         </p>
     </form>
 </x-guest-layout>
