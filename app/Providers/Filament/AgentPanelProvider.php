@@ -57,6 +57,34 @@ class AgentPanelProvider extends PanelProvider
             ->authGuard('web')
             ->registration(false)
             ->userMenuItems([
+                // Language switcher — reuses the existing route('lang.switch', $code)
+                // route, same mechanism as the public site's <x-language-switcher />
+                // component. Options come from config('app.available_locales'), same
+                // six locales (bn/en/ar/tl/hi/ur) as everywhere else in the app.
+                'lang_bn' => MenuItem::make()
+                    ->label(fn () => app()->getLocale() === 'bn' ? '✓ বাংলা' : 'বাংলা')
+                    ->icon('heroicon-o-language')
+                    ->url(fn () => route('lang.switch', 'bn')),
+                'lang_en' => MenuItem::make()
+                    ->label(fn () => app()->getLocale() === 'en' ? '✓ English' : 'English')
+                    ->icon('heroicon-o-language')
+                    ->url(fn () => route('lang.switch', 'en')),
+                'lang_ar' => MenuItem::make()
+                    ->label(fn () => app()->getLocale() === 'ar' ? '✓ العربية' : 'العربية')
+                    ->icon('heroicon-o-language')
+                    ->url(fn () => route('lang.switch', 'ar')),
+                'lang_tl' => MenuItem::make()
+                    ->label(fn () => app()->getLocale() === 'tl' ? '✓ Tagalog' : 'Tagalog')
+                    ->icon('heroicon-o-language')
+                    ->url(fn () => route('lang.switch', 'tl')),
+                'lang_hi' => MenuItem::make()
+                    ->label(fn () => app()->getLocale() === 'hi' ? '✓ हिन्दी' : 'हिन्दी')
+                    ->icon('heroicon-o-language')
+                    ->url(fn () => route('lang.switch', 'hi')),
+                'lang_ur' => MenuItem::make()
+                    ->label(fn () => app()->getLocale() === 'ur' ? '✓ اردو' : 'اردو')
+                    ->icon('heroicon-o-language')
+                    ->url(fn () => route('lang.switch', 'ur')),
                 'logout' => MenuItem::make()
                     ->label('লগ আউট')
                     ->icon('heroicon-o-arrow-left-on-rectangle')
