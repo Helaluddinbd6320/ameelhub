@@ -10,7 +10,7 @@
                     <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                     </svg>
-                    যাচাইকৃত এজেন্ট
+                    {{ __('messages.agent_profile.verified_agent') }}
                 </span>
             @endif
         </div>
@@ -30,7 +30,7 @@
 
             {{-- নাম --}}
             <h1 class="text-2xl font-bold text-gray-800">
-                {{ $agentProfile->agent_name_bn ?? $agentProfile->agent_name_en ?? 'নাম নেই' }}
+                {{ $agentProfile->agent_name_bn ?? $agentProfile->agent_name_en ?? __('messages.agent_profile.no_name') }}
             </h1>
             @if ($agentProfile->agent_name_en && $agentProfile->agent_name_bn)
                 <p class="text-sm text-gray-500 mt-0.5">{{ $agentProfile->agent_name_en }}</p>
@@ -50,7 +50,7 @@
                 @endif
                 @if ($agentProfile->years_in_business)
                     <span class="inline-flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-full">
-                        📅 {{ $agentProfile->years_in_business }} বছরের অভিজ্ঞতা
+                        📅 {{ $agentProfile->years_in_business }} {{ __('messages.agent_profile.years_experience') }}
                     </span>
                 @endif
             </div>
@@ -59,19 +59,19 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-7">
                 <div class="text-center bg-emerald-50 rounded-xl py-4 border border-emerald-100">
                     <p class="text-2xl font-bold text-emerald-700">{{ $agentProfile->successful_deals }}</p>
-                    <p class="text-xs text-gray-600 mt-1">সফল ডিল</p>
+                    <p class="text-xs text-gray-600 mt-1">{{ __('messages.agent_profile.successful_deals') }}</p>
                 </div>
                 <div class="text-center bg-emerald-50 rounded-xl py-4 border border-emerald-100">
                     <p class="text-2xl font-bold text-emerald-700">{{ $agentProfile->total_workers_placed }}</p>
-                    <p class="text-xs text-gray-600 mt-1">প্লেসড কর্মী</p>
+                    <p class="text-xs text-gray-600 mt-1">{{ __('messages.agent_profile.workers_placed') }}</p>
                 </div>
                 <div class="text-center bg-emerald-50 rounded-xl py-4 border border-emerald-100">
                     <p class="text-2xl font-bold text-emerald-700">{{ $agentProfile->total_jobs_posted }}</p>
-                    <p class="text-xs text-gray-600 mt-1">মোট জব পোস্ট</p>
+                    <p class="text-xs text-gray-600 mt-1">{{ __('messages.agent_profile.total_job_posts') }}</p>
                 </div>
                 <div class="text-center bg-emerald-50 rounded-xl py-4 border border-emerald-100">
                     <p class="text-2xl font-bold text-emerald-700">{{ $activeJobPosts->count() }}</p>
-                    <p class="text-xs text-gray-600 mt-1">সক্রিয় জব পোস্ট</p>
+                    <p class="text-xs text-gray-600 mt-1">{{ __('messages.agent_profile.active_job_posts') }}</p>
                 </div>
             </div>
 
@@ -80,7 +80,7 @@
             {{-- Active Job Posts --}}
             <div class="mt-8">
                 <div class="flex items-center gap-2 mb-4">
-                    <h2 class="text-lg font-semibold text-gray-800">সক্রিয় জব পোস্ট</h2>
+                    <h2 class="text-lg font-semibold text-gray-800">{{ __('messages.agent_profile.active_job_posts') }}</h2>
                     @if ($activeJobPosts->count() > 0)
                         <span class="text-xs bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full">
                             {{ $activeJobPosts->count() }}
@@ -94,7 +94,7 @@
                             <div>
                                 <p class="font-semibold text-gray-800">{{ $job->job_title }}</p>
                                 <p class="text-sm text-gray-500 mt-1">
-                                    📍 {{ $job->employer_city }} &nbsp;·&nbsp; 👥 {{ $job->vacancies }} জন
+                                    📍 {{ $job->employer_city }} &nbsp;·&nbsp; 👥 {{ $job->vacancies }} {{ __('messages.agent_profile.people') }}
                                 </p>
                             </div>
                             <span class="shrink-0 text-sm font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
@@ -104,7 +104,7 @@
                     </div>
                 @empty
                     <div class="text-center py-10 bg-gray-50 rounded-xl">
-                        <p class="text-sm text-gray-400">এই মুহূর্তে কোনো সক্রিয় জব পোস্ট নেই।</p>
+                        <p class="text-sm text-gray-400">{{ __('messages.agent_profile.no_active_job_posts') }}</p>
                     </div>
                 @endforelse
             </div>

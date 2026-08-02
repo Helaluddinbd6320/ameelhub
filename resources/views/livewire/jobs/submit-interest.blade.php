@@ -1,7 +1,7 @@
 <div>
     @if ($alreadyApplied)
         <div class="rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 text-sm">
-            ✅ আপনি ইতিমধ্যে এই জবে আবেদন করেছেন। এজেন্ট শীঘ্রই যোগাযোগ করবে।
+            ✅ {{ __('messages.interest_button.already_applied') }}
         </div>
     @else
         @if ($errorMessage)
@@ -15,7 +15,7 @@
                 wire:click="openNoteForm"
                 class="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition"
             >
-                এই জবে আগ্রহ প্রকাশ করুন (Interest)
+                {{ __('messages.interest_button.express_interest') }}
             </button>
         @else
             <div class="space-y-3">
@@ -23,7 +23,7 @@
                     wire:model="note"
                     rows="3"
                     maxlength="500"
-                    placeholder="ঐচ্ছিক নোট (যেমন: কবে থেকে শুরু করতে পারবেন)"
+                    placeholder="{{ __('messages.interest_button.note_placeholder') }}"
                     class="w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500"
                 ></textarea>
                 @error('note')
@@ -36,14 +36,14 @@
                         wire:loading.attr="disabled"
                         class="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 px-4 rounded-lg transition disabled:opacity-50"
                     >
-                        <span wire:loading.remove>জমা দিন</span>
-                        <span wire:loading>পাঠানো হচ্ছে...</span>
+                        <span wire:loading.remove>{{ __('messages.interest_button.submit') }}</span>
+                        <span wire:loading>{{ __('messages.interest_button.sending') }}</span>
                     </button>
                     <button
                         wire:click="$set('showNoteForm', false)"
                         class="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50"
                     >
-                        বাতিল
+                        {{ __('messages.interest_button.cancel') }}
                     </button>
                 </div>
             </div>

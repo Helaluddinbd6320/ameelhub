@@ -1,13 +1,13 @@
 <div class="max-w-5xl mx-auto px-4 py-10">
 
     <div class="text-center mb-10">
-        <h1 class="text-3xl font-bold text-gray-800">এজেন্ট লিডারবোর্ড</h1>
-        <p class="text-gray-500 mt-2">সবচেয়ে বেশি সফল ডিল সম্পন্ন করা ভেরিফাইড এজেন্টরা</p>
+        <h1 class="text-3xl font-bold text-gray-800">{{ __('messages.agent_leaderboard.title') }}</h1>
+        <p class="text-gray-500 mt-2">{{ __('messages.agent_leaderboard.subtitle') }}</p>
     </div>
 
     @if($agents->isEmpty())
         <div class="text-center py-16 text-gray-400">
-            এখনো কোনো ভেরিফাইড এজেন্ট সফল ডিল সম্পন্ন করেননি।
+            {{ __('messages.agent_leaderboard.no_agents') }}
         </div>
     @else
 
@@ -33,10 +33,10 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
                             <span class="font-semibold text-gray-800 truncate">
-                                {{ $agent->agent_name_bn ?? $agent->agent_name_en ?? 'নাম নেই' }}
+                                {{ $agent->agent_name_bn ?? $agent->agent_name_en ?? __('messages.agent_leaderboard.no_name') }}
                             </span>
                             <span class="inline-flex items-center gap-1 text-xs text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                                ✓ Verified
+                                ✓ {{ __('messages.agent_leaderboard.verified') }}
                             </span>
                         </div>
                         <div class="text-sm text-gray-500 truncate">
@@ -50,11 +50,11 @@
                     <div class="flex-shrink-0 flex items-center gap-6 text-center">
                         <div>
                             <div class="text-lg font-bold text-gray-800">{{ $agent->successful_deals_count }}</div>
-                            <div class="text-xs text-gray-400">সফল ডিল</div>
+                            <div class="text-xs text-gray-400">{{ __('messages.agent_leaderboard.successful_deals') }}</div>
                         </div>
                         <div>
                             <div class="text-lg font-bold text-gray-800">{{ $agent->workers_placed_count }}</div>
-                            <div class="text-xs text-gray-400">কর্মী প্লেসড</div>
+                            <div class="text-xs text-gray-400">{{ __('messages.agent_leaderboard.workers_placed') }}</div>
                         </div>
                     </div>
                 </a>

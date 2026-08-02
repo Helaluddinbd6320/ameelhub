@@ -13,16 +13,16 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 rtl:space-x-reverse sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('workers.index')" :active="request()->routeIs('workers.index')">
-                        {{ __('কর্মীদের তালিকা') }}
+                        {{ __('messages.nav.workers_list') }}
                     </x-nav-link>
 
                     <x-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.index')">
-                        {{ __('জব দেখুন') }}
+                        {{ __('messages.nav.view_jobs') }}
                     </x-nav-link>
 
                     @auth
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                            {{ __('Dashboard') }}
+                            {{ __('messages.nav.dashboard') }}
                         </x-nav-link>
                     @endauth
                 </div>
@@ -48,7 +48,7 @@
 
                         <x-slot name="content">
                             <x-dropdown-link :href="route('profile.edit')">
-                                {{ __('Profile') }}
+                                {{ __('messages.nav.profile') }}
                             </x-dropdown-link>
 
                             <!-- Authentication -->
@@ -58,21 +58,21 @@
                                 <x-dropdown-link :href="route('logout')"
                                         onclick="event.preventDefault();
                                                     this.closest('form').submit();">
-                                    {{ __('Log Out') }}
+                                    {{ __('messages.nav.log_out') }}
                                 </x-dropdown-link>
                             </form>
                         </x-slot>
                     </x-dropdown>
                 @else
                     <a href="{{ route('login') }}" class="text-sm text-gray-600 hover:text-gray-900 me-4">
-                        {{ __('লগইন') }}
+                        {{ __('messages.nav.login') }}
                     </a>
                     <a href="{{ route('register') }}"
                        class="text-sm font-semibold rounded-lg px-4 py-2 transition-colors"
                        style="background-color:#C9974C; color:#0B4F3F;"
                        onmouseover="this.style.backgroundColor='#dbab5e'"
                        onmouseout="this.style.backgroundColor='#C9974C'">
-                        {{ __('রেজিস্ট্রেশন') }}
+                        {{ __('messages.nav.register') }}
                     </a>
                 @endauth
             </div>
@@ -95,16 +95,16 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('workers.index')" :active="request()->routeIs('workers.index')">
-                {{ __('কর্মীদের তালিকা') }}
+                {{ __('messages.nav.workers_list') }}
             </x-responsive-nav-link>
 
             <x-responsive-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.index')">
-                {{ __('জব দেখুন') }}
+                {{ __('messages.nav.view_jobs') }}
             </x-responsive-nav-link>
 
             @auth
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                    {{ __('Dashboard') }}
+                    {{ __('messages.nav.dashboard') }}
                 </x-responsive-nav-link>
             @endauth
         </div>
@@ -119,7 +119,7 @@
 
                 <div class="mt-3 space-y-1">
                     <x-responsive-nav-link :href="route('profile.edit')">
-                        {{ __('Profile') }}
+                        {{ __('messages.nav.profile') }}
                     </x-responsive-nav-link>
 
                     <!-- Authentication -->
@@ -129,17 +129,17 @@
                         <x-responsive-nav-link :href="route('logout')"
                                 onclick="event.preventDefault();
                                             this.closest('form').submit();">
-                            {{ __('Log Out') }}
+                            {{ __('messages.nav.log_out') }}
                         </x-responsive-nav-link>
                     </form>
                 </div>
             @else
                 <div class="px-4 space-y-2">
                     <x-responsive-nav-link :href="route('login')">
-                        {{ __('লগইন') }}
+                        {{ __('messages.nav.login') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('register')">
-                        {{ __('রেজিস্ট্রেশন') }}
+                        {{ __('messages.nav.register') }}
                     </x-responsive-nav-link>
                 </div>
             @endauth

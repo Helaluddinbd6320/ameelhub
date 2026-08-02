@@ -29,6 +29,12 @@ return [
         'login' => 'Login',
         'register' => 'Register',
         'logout' => 'Logout',
+
+        'workers_list' => 'Workers List',
+        'view_jobs' => 'View Jobs',
+        'dashboard' => 'Dashboard',
+        'profile' => 'Profile',
+        'log_out' => 'Log Out',
     ],
     'common' => [
         'submit' => 'Submit',
@@ -230,5 +236,55 @@ return [
         'optional_note' => 'Optional note...',
         'cancel' => 'Cancel',
         'submit_interest' => 'Submit Interest',
+    ],
+
+    'dashboard' => [
+        'title' => 'Dashboard',
+        'welcome' => 'Welcome',
+        'welcome_message' => 'Welcome to your secure platform.',
+        'account_verified' => 'Account Verified',
+        'access_control_panel' => 'Access Control Panel',
+        'access_hint' => 'Enter the dashboard below based on your assigned role',
+        'admin_central' => 'Admin Control Central',
+        'admin_desc' => 'Manage platform users, license verification, and overall settings.',
+        'go_to_admin' => 'Go to Admin Panel',
+        'agent_workspace' => 'Agent Workspace',
+        'agent_desc' => 'Register new workers, track your referral bonuses, and view job updates.',
+        'go_to_agent' => 'Go to Agent Panel',
+        'worker_profile_portal' => 'Worker Profile & Job Portal',
+        'worker_desc' => 'Update your passport and details, apply for new jobs, and track your visa progress.',
+        'go_to_worker' => 'Go to Worker Panel',
+        'footer_license' => 'License No. 0016205 · Government of Bangladesh Approved Recruiting Agency',
+    ],
+
+    'interest_button' => [
+        'already_applied' => 'You have already applied for this job. An agent will contact you soon.',
+        'express_interest' => 'Express Interest in This Job',
+        'note_placeholder' => 'Optional note (e.g. when you can start)',
+        'submit' => 'Submit',
+        'sending' => 'Sending...',
+        'cancel' => 'Cancel',
+    ],
+
+    'agent_leaderboard' => [
+        'title' => 'Agent Leaderboard',
+        'subtitle' => 'Verified agents with the most successful deals',
+        'no_agents' => 'No verified agents have completed a successful deal yet.',
+        'no_name' => 'No Name',
+        'verified' => 'Verified',
+        'successful_deals' => 'Successful Deals',
+        'workers_placed' => 'Workers Placed',
+    ],
+
+    'agent_profile' => [
+        'verified_agent' => 'Verified Agent',
+        'no_name' => 'No Name',
+        'years_experience' => 'years of experience',
+        'successful_deals' => 'Successful Deals',
+        'workers_placed' => 'Workers Placed',
+        'total_job_posts' => 'Total Job Posts',
+        'active_job_posts' => 'Active Job Posts',
+        'people' => 'people',
+        'no_active_job_posts' => 'No active job posts at the moment.',
     ],
 ];

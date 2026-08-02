@@ -14,12 +14,12 @@
             <div class="relative z-10">
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2"
                     style="font-family: 'Noto Serif Bengali', serif;">
-                    ড্যাশবোর্ড
+                    {{ __('messages.dashboard.title') }}
                 </h2>
                 <p class="text-white/70 text-sm">
-                    স্বাগতম, <span
+                    {{ __('messages.dashboard.welcome') }}, <span
                         class="text-white font-bold underline decoration-[#C9974C] decoration-2">{{ Auth::user()->name }}</span>!
-                    আপনার নিরাপদ প্ল্যাটফর্মে আপনাকে স্বাগতম।
+                    {{ __('messages.dashboard.welcome_message') }}
                 </p>
             </div>
 
@@ -35,7 +35,7 @@
                         d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
                         clip-rule="evenodd" />
                 </svg>
-                অ্যাকাউন্ট ভেরিফাইড
+                {{ __('messages.dashboard.account_verified') }}
             </div>
         </div>
 
@@ -46,9 +46,9 @@
 
                 <div class="text-center sm:text-left border-b border-gray-100 pb-5 mb-6">
                     <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                        অ্যাক্সেস কন্ট্রোল প্যানেল
+                        {{ __('messages.dashboard.access_control_panel') }}
                     </h4>
-                    <p class="text-sm text-gray-500 mt-1">আপনার নির্ধারিত দায়িত্ব অনুযায়ী নিচের ড্যাশবোর্ডে প্রবেশ করুন
+                    <p class="text-sm text-gray-500 mt-1">{{ __('messages.dashboard.access_hint') }}
                     </p>
                 </div>
 
@@ -68,14 +68,13 @@
                                 </svg>
                             </div>
                             <div>
-                                <h5 class="font-bold text-gray-900 text-base">অ্যাডমিন কন্ট্রোল সেন্ট্রাল</h5>
-                                <p class="text-xs text-gray-500 mt-0.5">প্ল্যাটফর্মের ব্যবহারকারী, লাইসেন্স ভেরিফিকেশন
-                                    এবং সামগ্রিক সেটিংস পরিচালনা করুন।</p>
+                                <h5 class="font-bold text-gray-900 text-base">{{ __('messages.dashboard.admin_central') }}</h5>
+                                <p class="text-xs text-gray-500 mt-0.5">{{ __('messages.dashboard.admin_desc') }}</p>
                             </div>
                         </div>
                         <a href="{{ url('/admin') }}"
                             class="w-full sm:w-auto text-center px-6 py-3 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 shadow-md shadow-red-600/10 transition-all whitespace-nowrap">
-                            অ্যাডমিন প্যানেলে যান
+                            {{ __('messages.dashboard.go_to_admin') }}
                         </a>
                     </div>
                 @endif
@@ -94,9 +93,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h5 class="font-bold text-gray-900 text-base">এজেন্ট ওয়ার্কস্পেস</h5>
-                                <p class="text-xs text-gray-500 mt-0.5">নতুন কর্মী নিবন্ধন করুন, আপনার রেফারেল বোনাস
-                                    ট্র্যাক করুন এবং কাজের আপডেট দেখুন।</p>
+                                <h5 class="font-bold text-gray-900 text-base">{{ __('messages.dashboard.agent_workspace') }}</h5>
+                                <p class="text-xs text-gray-500 mt-0.5">{{ __('messages.dashboard.agent_desc') }}</p>
                             </div>
                         </div>
                         <a href="{{ url('/agent') }}"
@@ -104,7 +102,7 @@
                             style="background-color:#C9974C; color:#0B4F3F;"
                             onmouseover="this.style.backgroundColor='#dbab5e'; this.style.transform='translateY(-1px)'"
                             onmouseout="this.style.backgroundColor='#C9974C'; this.style.transform='translateY(0)'">
-                            এজেন্ট প্যানেলে যান
+                            {{ __('messages.dashboard.go_to_agent') }}
                         </a>
                     </div>
                 @endif
@@ -123,9 +121,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h5 class="font-bold text-gray-900 text-base">কর্মী প্রোফাইল ও জব পোর্টাল</h5>
-                                <p class="text-xs text-gray-500 mt-0.5">আপনার পাসপোর্ট ও তথ্য আপডেট করুন, নতুন জবে আবেদন
-                                    করুন এবং ভিসার অগ্রগতি দেখুন।</p>
+                                <h5 class="font-bold text-gray-900 text-base">{{ __('messages.dashboard.worker_profile_portal') }}</h5>
+                                <p class="text-xs text-gray-500 mt-0.5">{{ __('messages.dashboard.worker_desc') }}</p>
                             </div>
                         </div>
                         <a href="{{ url('/worker') }}"
@@ -133,7 +130,7 @@
                             style="background-color:#0B4F3F;"
                             onmouseover="this.style.backgroundColor='#0e6350'; this.style.transform='translateY(-1px)'"
                             onmouseout="this.style.backgroundColor='#0B4F3F'; this.style.transform='translateY(0)'">
-                            কর্মী প্যানেলে যান
+                            {{ __('messages.dashboard.go_to_worker') }}
                         </a>
                     </div>
                 @endif
@@ -142,7 +139,7 @@
 
             {{-- Small footer info inside container --}}
             <p class="text-center mt-6 text-xs text-gray-400">
-                লাইসেন্স নং ০০১৬২০৫ · গণপ্রজাতন্ত্রী বাংলাদেশ সরকার অনুমোদিত রিক্রুটিং এজেন্সি
+                {{ __('messages.dashboard.footer_license') }}
             </p>
         </div>
     </div>
