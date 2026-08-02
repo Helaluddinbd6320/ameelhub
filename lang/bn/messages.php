@@ -2,6 +2,24 @@
 
 return [
     'site_name' => 'AmeelHub',
+
+    'home' => [
+        'hero_title' => 'আপনার টাকা আমাদের কাছে নিরাপদ',
+        'hero_subtitle' => 'কাজ বুঝে পেলে Agent পাবে — মাইলস্টোন ভিত্তিক এস্ক্রো সিস্টেম',
+        'license_no' => 'লাইসেন্স নং ০০১৬২০৫',
+        'find_workers' => 'কর্মী খুঁজুন',
+        'view_jobs' => 'জব দেখুন',
+        'featured_workers' => 'ফিচারড কর্মী',
+        'featured_badge' => 'ফিচারড',
+        'latest_workers' => 'সাম্প্রতিক কর্মী',
+        'latest_jobs' => 'সাম্প্রতিক জব',
+        'view_all' => 'সব দেখুন',
+        'no_photo' => 'ছবি নেই',
+        'no_workers_found' => 'কোনো কর্মী পাওয়া যায়নি।',
+        'no_jobs_found' => 'কোনো জব পাওয়া যায়নি।',
+        'vacancies_left' => 'শূন্যপদ বাকি',
+    ],
+
     'nav' => [
         'home' => 'হোম',
         'workers' => 'কর্মী তালিকা',

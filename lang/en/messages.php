@@ -2,6 +2,25 @@
 
 return [
     'site_name' => 'AmeelHub',
+
+    'home' => [
+        'hero_title' => 'Your Money is Safe With Us',
+        'hero_subtitle' => 'Agents get paid once work is verified — milestone-based escrow system',
+        'license_no' => 'License No. 0016205',
+        'find_workers' => 'Find Workers',
+        'view_jobs' => 'View Jobs',
+        'featured_workers' => 'Featured Workers',
+        'featured_badge' => 'Featured',
+        'latest_workers' => 'Latest Workers',
+        'latest_jobs' => 'Latest Jobs',
+        'view_all' => 'View All',
+        'no_photo' => 'No Photo',
+        'no_workers_found' => 'No workers found.',
+        'no_jobs_found' => 'No jobs found.',
+        'vacancies_left' => 'vacancies left',
+    ],
+
+    
     'nav' => [
         'home' => 'Home',
         'workers' => 'Workers',

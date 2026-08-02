@@ -2,6 +2,27 @@
 
 return [
     'site_name' => 'AmeelHub',
+
+
+    'home' => [
+        'hero_title' => 'أموالكم آمنة معنا',
+        'hero_subtitle' => 'يحصل الوكيل على الدفع بعد التحقق من العمل — نظام ضمان قائم على مراحل الإنجاز',
+        'license_no' => 'رخصة رقم ٠٠١٦٢٠٥',
+        'find_workers' => 'ابحث عن عمال',
+        'view_jobs' => 'عرض الوظائف',
+        'featured_workers' => 'عمال مميزون',
+        'featured_badge' => 'مميز',
+        'latest_workers' => 'أحدث العمال',
+        'latest_jobs' => 'أحدث الوظائف',
+        'view_all' => 'عرض الكل',
+        'no_photo' => 'لا توجد صورة',
+        'no_workers_found' => 'لم يتم العثور على عمال.',
+        'no_jobs_found' => 'لم يتم العثور على وظائف.',
+        'vacancies_left' => 'شواغر متبقية',
+    ],
+
+
+    
     'nav' => [
         'home' => 'الرئيسية',
         'workers' => 'العمال',
