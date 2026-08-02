@@ -9,6 +9,7 @@ use App\Http\Middleware\RedirectToCentralLogin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use App\Filament\Worker\Widgets\RecommendedJobsWidget;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -84,7 +85,14 @@ class WorkerPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Worker/Widgets'), for: 'App\\Filament\\Worker\\Widgets')
-            ->widgets([])
+            // BUG FIX (Step 11.3 audit): ->widgets([]) called after
+            // discoverWidgets() was overriding/wiping the auto-discovered
+            // widget set — same override bug as ->pages([]) above. Explicitly
+            // listing RecommendedJobsWidget here guarantees it actually
+            // reaches the Dashboard page regardless of discovery behavior.
+            ->widgets([
+                RecommendedJobsWidget::class,
+            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
