@@ -93,7 +93,11 @@ return [
             'my_selections' => 'اختياراتي',
         ],
 
-        'workers_page' => [
+       
+
+    ],
+
+     'workers_page' => [
         'title' => 'قائمة العمال',
         'all_skills' => 'كل المهن',
         'all_visa_status' => 'كل حالات التأشيرة',
@@ -113,6 +117,4 @@ return [
         'reset_and_view_again' => 'أعد تعيين الفلاتر وحاول مرة أخرى',
     ],
 
-    
-    ],
 ];

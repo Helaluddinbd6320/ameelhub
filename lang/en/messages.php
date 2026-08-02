@@ -93,7 +93,12 @@ return [
         ],
 
 
-        'workers_page' => [
+       
+
+
+    ],
+
+     'workers_page' => [
         'title' => 'Workers List',
         'all_skills' => 'All Skills',
         'all_visa_status' => 'All Visa Status',
@@ -111,8 +116,5 @@ return [
         'featured' => 'Featured',
         'no_workers_found' => 'No workers found.',
         'reset_and_view_again' => 'Reset filters and try again',
-    ],
-
-    
     ],
 ];

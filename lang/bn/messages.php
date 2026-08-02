@@ -91,7 +91,11 @@ return [
         ],
 
 
-        'workers_page' => [
+       
+
+    ],
+
+     'workers_page' => [
         'title' => 'কর্মীদের তালিকা',
         'all_skills' => 'সব পেশা',
         'all_visa_status' => 'সব ভিসা স্ট্যাটাস',
@@ -109,7 +113,5 @@ return [
         'featured' => 'ফিচারড',
         'no_workers_found' => 'কোনো কর্মী পাওয়া যায়নি।',
         'reset_and_view_again' => 'ফিল্টার রিসেট করে আবার দেখুন',
-    ],
-    
     ],
 ];
