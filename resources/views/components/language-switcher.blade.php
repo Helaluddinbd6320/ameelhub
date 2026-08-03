@@ -9,18 +9,28 @@
     {{-- Step: new-locales — with 6 locales now (bn/en/ar/tl/hi/ur), a row of
     individual buttons no longer fits comfortably on small screens. A single
     native <select> is far more compact and needs no JS framework — just a
-    plain onchange redirect. --}}
-    <select
-        onchange="window.location.href = this.value"
-        class="text-xs font-medium rounded-md border border-gray-200 bg-white text-gray-600 px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        aria-label="Select language"
-    >
-        @foreach($locales as $code => $meta)
-            <option value="{{ route('lang.switch', $code) }}" @selected($current === $code)>
-                {{ $meta['native'] ?? strtoupper($code) }}
-            </option>
-        @endforeach
-    </select>
+    plain onchange redirect. A language icon is layered on top since a bare
+    <select> with just 2-3 letter codes looked empty on its own. --}}
+    <div class="relative inline-flex items-center">
+        <svg class="absolute left-2 h-4 w-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.5 7a10.05 10.05 0 01-4.412 6.5" />
+        </svg>
+        <select
+            onchange="window.location.href = this.value"
+            class="text-xs font-medium rounded-md border border-gray-200 bg-white text-gray-600 ps-7 pe-6 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none"
+            aria-label="Select language"
+        >
+            @foreach($locales as $code => $meta)
+                <option value="{{ route('lang.switch', $code) }}" @selected($current === $code)>
+                    {{ $meta['native'] ?? strtoupper($code) }}
+                </option>
+            @endforeach
+        </select>
+        <svg class="absolute right-1.5 h-3 w-3 text-gray-400 pointer-events-none rtl:scale-x-[-1]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" fill="currentColor" />
+        </svg>
+    </div>
 @else
     <x-dropdown align="right" width="40">
         <x-slot name="trigger">
