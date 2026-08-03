@@ -4,6 +4,20 @@
 
 @theme {
     --font-sans: 'Figtree', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+    /* Step: new-locales — Urdu uses the Nastaliq script, which needs a
+       distinct font stack from the Latin/Bengali "sans" default. Defining
+       this as a --font-* theme variable makes Tailwind v4 auto-generate
+       the `font-urdu` utility class used in layouts/app.blade.php. */
+    --font-urdu: 'Noto Nastaliq Urdu', serif;
+}
+
+/* Nastaliq glyphs are taller/more connected than Latin/Bengali sans-serif
+   text, so the default line-height reads too cramped. This is not something
+   Tailwind's auto-generated font-urdu utility covers, so it's added here
+   as a plain override scoped to that same class. */
+.font-urdu {
+    line-height: 2.1;
 }
 
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
