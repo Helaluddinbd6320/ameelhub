@@ -10,12 +10,16 @@ class LocaleController extends Controller
     /**
      * Supported application locales.
      *
+     * Step: new-locales — kept in sync with SetLocale middleware's
+     * $supportedLocales and config('app.available_locales'). If you add
+     * another locale in the future, update all three in the same commit.
+     *
      * @var array<int, string>
      */
-    private const SUPPORTED_LOCALES = ['bn', 'en', 'ar'];
+    private const SUPPORTED_LOCALES = ['bn', 'en', 'ar', 'tl', 'hi', 'ur'];
 
     /**
-     * Switch the session locale (bn/en/ar) and redirect back.
+     * Switch the session locale and redirect back.
      */
     public function __invoke(string $locale, Request $request): RedirectResponse
     {
