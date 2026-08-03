@@ -6,18 +6,21 @@
 @endphp
 
 @if($mobile)
-    {{-- Compact mobile version: cycles through a simple button row --}}
-    <div class="flex items-center gap-1">
+    {{-- Step: new-locales — with 6 locales now (bn/en/ar/tl/hi/ur), a row of
+    individual buttons no longer fits comfortably on small screens. A single
+    native <select> is far more compact and needs no JS framework — just a
+    plain onchange redirect. --}}
+    <select
+        onchange="window.location.href = this.value"
+        class="text-xs font-medium rounded-md border border-gray-200 bg-white text-gray-600 px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        aria-label="Select language"
+    >
         @foreach($locales as $code => $meta)
-            <a href="{{ route('lang.switch', $code) }}"
-                class="px-2 py-1 text-xs font-medium rounded-md border
-                    {{ $current === $code
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white text-gray-500 border-gray-200 hover:text-gray-800' }}">
-                {{ strtoupper($code) }}
-            </a>
+            <option value="{{ route('lang.switch', $code) }}" @selected($current === $code)>
+                {{ $meta['native'] ?? strtoupper($code) }}
+            </option>
         @endforeach
-    </div>
+    </select>
 @else
     <x-dropdown align="right" width="40">
         <x-slot name="trigger">
