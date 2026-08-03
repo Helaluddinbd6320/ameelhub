@@ -34,6 +34,15 @@ class WorkerPanelProvider extends PanelProvider
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
                 fn(): string => Blade::render('@livewire(\'notification-bell\')'),
             )
+            // Step: new-locales — language switcher moved from the avatar menu
+            // (where 6 flat items made the dropdown too long) to a topbar icon,
+            // reusing the exact same <x-language-switcher /> component the
+            // public site already uses. Filament's MenuItem has no submenu
+            // support, so this was simpler than a custom collapsible group.
+            ->renderHook(
+                PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
+                fn(): string => Blade::render('<x-language-switcher />'),
+            )
             // BUG FIX (Helal-reported, Step 10.9 audit): email-verification
             // nudge banner. Login/panel access intentionally stays open for
             // unverified users (business decision) — this just renders a
@@ -66,30 +75,6 @@ class WorkerPanelProvider extends PanelProvider
                     ->label('সাইট দেখুন')
                     ->icon('heroicon-o-eye')
                     ->url(fn () => url('/'), shouldOpenInNewTab: true),
-                'lang_bn' => MenuItem::make()
-                    ->label(fn () => app()->getLocale() === 'bn' ? '✓ বাংলা' : 'বাংলা')
-                    ->icon('heroicon-o-language')
-                    ->url(fn () => route('lang.switch', 'bn')),
-                'lang_en' => MenuItem::make()
-                    ->label(fn () => app()->getLocale() === 'en' ? '✓ English' : 'English')
-                    ->icon('heroicon-o-language')
-                    ->url(fn () => route('lang.switch', 'en')),
-                'lang_ar' => MenuItem::make()
-                    ->label(fn () => app()->getLocale() === 'ar' ? '✓ العربية' : 'العربية')
-                    ->icon('heroicon-o-language')
-                    ->url(fn () => route('lang.switch', 'ar')),
-                'lang_tl' => MenuItem::make()
-                    ->label(fn () => app()->getLocale() === 'tl' ? '✓ Tagalog' : 'Tagalog')
-                    ->icon('heroicon-o-language')
-                    ->url(fn () => route('lang.switch', 'tl')),
-                'lang_hi' => MenuItem::make()
-                    ->label(fn () => app()->getLocale() === 'hi' ? '✓ हिन्दी' : 'हिन्दी')
-                    ->icon('heroicon-o-language')
-                    ->url(fn () => route('lang.switch', 'hi')),
-                'lang_ur' => MenuItem::make()
-                    ->label(fn () => app()->getLocale() === 'ur' ? '✓ اردو' : 'اردو')
-                    ->icon('heroicon-o-language')
-                    ->url(fn () => route('lang.switch', 'ur')),
                 'logout' => MenuItem::make()
                     ->label('লগ আউট')
                     ->icon('heroicon-o-arrow-left-on-rectangle')
