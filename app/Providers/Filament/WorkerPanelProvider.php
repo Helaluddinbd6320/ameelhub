@@ -62,6 +62,10 @@ class WorkerPanelProvider extends PanelProvider
             ->authGuard('web')
             ->registration(false)
             ->userMenuItems([
+                'view_site' => MenuItem::make()
+                    ->label('সাইট দেখুন')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn () => url('/'), shouldOpenInNewTab: true),
                 'lang_bn' => MenuItem::make()
                     ->label(fn () => app()->getLocale() === 'bn' ? '✓ বাংলা' : 'বাংলা')
                     ->icon('heroicon-o-language')

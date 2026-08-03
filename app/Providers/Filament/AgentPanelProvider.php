@@ -57,6 +57,10 @@ class AgentPanelProvider extends PanelProvider
             ->authGuard('web')
             ->registration(false)
             ->userMenuItems([
+                'view_site' => MenuItem::make()
+                    ->label('সাইট দেখুন')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn () => url('/'), shouldOpenInNewTab: true),
                 // Language switcher — reuses the existing route('lang.switch', $code)
                 // route, same mechanism as the public site's <x-language-switcher />
                 // component. Options come from config('app.available_locales'), same
