@@ -30,18 +30,16 @@ class WorkerPanelProvider extends PanelProvider
     {
         return $panel
             ->id('worker')
-            ->renderHook(
-                PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
-                fn(): string => Blade::render('@livewire(\'notification-bell\')'),
-            )
-            // Step: new-locales — language switcher moved from the avatar menu
-            // (where 6 flat items made the dropdown too long) to a topbar icon,
-            // reusing the exact same <x-language-switcher /> component the
-            // public site already uses. Filament's MenuItem has no submenu
-            // support, so this was simpler than a custom collapsible group.
+            // Step: new-locales — registered before notification-bell so it
+            // renders to the left of it in the topbar (DOM order = visual
+            // order in this flex row), including on mobile.
             ->renderHook(
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
                 fn(): string => Blade::render('<x-language-switcher />'),
+            )
+            ->renderHook(
+                PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
+                fn(): string => Blade::render('@livewire(\'notification-bell\')'),
             )
             // BUG FIX (Helal-reported, Step 10.9 audit): email-verification
             // nudge banner. Login/panel access intentionally stays open for

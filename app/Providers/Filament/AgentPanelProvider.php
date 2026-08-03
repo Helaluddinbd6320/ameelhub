@@ -28,16 +28,15 @@ class AgentPanelProvider extends PanelProvider
     {
         return $panel
             ->id('agent')
-            ->renderHook(
-                PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
-                fn(): string => Blade::render('@livewire(\'notification-bell\')'),
-            )
-            // Step: new-locales — same topbar language icon as WorkerPanelProvider,
-            // reusing <x-language-switcher />. See that file's comment for the
-            // full rationale (Filament MenuItem has no submenu support).
+            // Step: new-locales — registered before notification-bell so it
+            // renders to the left of it in the topbar, including on mobile.
             ->renderHook(
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
                 fn(): string => Blade::render('<x-language-switcher />'),
+            )
+            ->renderHook(
+                PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
+                fn(): string => Blade::render('@livewire(\'notification-bell\')'),
             )
             // BUG FIX (Helal-reported, Step 10.9 audit): same email-verification
             // nudge banner as WorkerPanelProvider — see that file's comment
