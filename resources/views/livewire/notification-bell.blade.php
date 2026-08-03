@@ -27,6 +27,15 @@
         @endif
     </button>
 
+    {{--
+        Step: new-locales — in RTL (Arabic/Urdu), the old `right-0` physical
+        anchor could push this panel off-screen on narrow phones since the
+        button's own position shifts around in RTL flex layouts. Fixed on
+        mobile (< sm): center it on the viewport with `fixed` + transform,
+        which is direction-independent (no left/right anchor to fight with
+        RTL at all). On sm and up, the original right-anchored dropdown
+        behavior is restored via `sm:` overrides, unchanged from before.
+    --}}
     <div
         x-show="open"
         x-cloak
@@ -37,7 +46,9 @@
         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
         x-transition:leave-end="opacity-0 translate-y-1 scale-95"
         role="menu"
-        class="absolute right-0 top-12 z-50 w-[22rem] max-w-[90vw] rounded-2xl bg-white dark:bg-gray-900 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] dark:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 overflow-hidden"
+        class="fixed left-1/2 -translate-x-1/2 top-16
+            sm:absolute sm:left-auto sm:translate-x-0 sm:right-0 sm:top-12
+            z-50 w-[22rem] max-w-[90vw] rounded-2xl bg-white dark:bg-gray-900 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] dark:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-white/10 overflow-hidden"
     >
         {{-- Header: title pinned left, action pinned right --}}
         <div class="flex items-center justify-between gap-3 px-5 py-4 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.02]">
