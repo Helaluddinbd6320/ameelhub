@@ -6,6 +6,7 @@ use App\Models\Setting;
 use BackedEnum;
 use Filament\Forms\Components\Select as FormSelect;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
@@ -85,6 +86,8 @@ class Settings extends Page implements HasForms
             'site_name', 'site_url', 'contact_email', 'contact_phone', 'default_locale',
             // SOCIAL
             'facebook_url', 'instagram_url', 'whatsapp_support',
+            // ANNOUNCEMENT TICKER (Worker + Agent panel scrolling alert bar)
+            'alert_ticker_enabled', 'alert_ticker_message', 'alert_ticker_whatsapp',
         ];
     }
 
@@ -95,6 +98,12 @@ class Settings extends Page implements HasForms
         foreach ($this->settingKeys() as $key) {
             $current[$key] = Setting::get($key);
         }
+
+        // Toggle কম্পোনেন্টের state boolean আশা করে — DB তে '1'/'0' string
+        // হিসেবে থাকা value কে এখানে bool এ রূপান্তর করা হচ্ছে, নাহলে ফর্ম
+        // লোড হওয়ার সময় Toggle সবসময় off দেখাবে, '1' string সরাসরি pass
+        // করলে Filament-এর strict bool cast তা মেলাতে পারে না।
+        $current['alert_ticker_enabled'] = $current['alert_ticker_enabled'] === '1';
 
         $this->form->fill($current);
     }
@@ -318,6 +327,30 @@ class Settings extends Page implements HasForms
 
                     ])->columns(2),
 
+                    // ════════════════════════════════════════
+                    // TAB 6 — ঘোষণা টিকার (Alert Ticker)
+                    // ════════════════════════════════════════
+                    Tab::make('ঘোষণা টিকার')->schema([
+
+                        Toggle::make('alert_ticker_enabled')
+                            ->label('স্ক্রলিং অ্যালার্ট বার সক্রিয় করুন')
+                            ->helperText('চালু থাকলে Worker ও Agent Panel-এর প্রতিটা পেজের উপরে ডান থেকে বামে scroll করা বার্তা দেখাবে')
+                            ->columnSpanFull(),
+
+                        TextInput::make('alert_ticker_message')
+                            ->label('বার্তা')
+                            ->placeholder('যেকোনো প্রয়োজনে যোগাযোগ করুন —')
+                            ->maxLength(300)
+                            ->columnSpanFull(),
+
+                        TextInput::make('alert_ticker_whatsapp')
+                            ->label('WhatsApp নম্বর (দেশের কোডসহ, যেমন +966...)')
+                            ->tel()
+                            ->maxLength(30)
+                            ->nullable(),
+
+                    ])->columns(2),
+
                 ])->columnSpanFull(),
             ])
             ->statePath('data');
@@ -327,12 +360,22 @@ class Settings extends Page implements HasForms
      * ফর্ম validate করে (numeric/url/email rules সহ) প্রতিটা key
      * Setting::set() দিয়ে সেভ করে — যা স্বয়ংক্রিয়ভাবে সংশ্লিষ্ট cache key-ও
      * invalidate করে দেয় (Setting model দেখুন)।
+     *
+     * NOTE: alert_ticker_enabled আলাদাভাবে handle করা হয়েছে কারণ Toggle-এর
+     * state boolean — সরাসরি (string) cast করলে false => "" (খালি স্ট্রিং)
+     * হয়ে যেত, '0' না। alert-ticker.blade.php-এর `=== '1'` চেক তখন সঠিকভাবে
+     * off অবস্থা ধরতে পারত না ভবিষ্যতে '0' দিয়ে সরাসরি DB match করার সময়।
      */
     public function save(): void
     {
         $state = $this->form->getState();
 
         foreach ($state as $key => $value) {
+            if ($key === 'alert_ticker_enabled') {
+                Setting::set($key, $value ? '1' : '0');
+                continue;
+            }
+
             Setting::set($key, (string) $value);
         }
 

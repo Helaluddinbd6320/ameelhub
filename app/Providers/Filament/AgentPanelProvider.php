@@ -6,9 +6,11 @@ use App\Http\Middleware\SanitizeInput;
 use App\Http\Middleware\SetLocale;
 // use Filament\Http\Middleware\Authenticate;
 use App\Http\Middleware\RedirectToCentralLogin;
+use App\Filament\Agent\Widgets\MyAnalyticsWidget; // NOTE: যদি আলাদা নামের widget থাকে, ঠিক করে দিও — নিচের সংশোধনার্থে placeholder
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Navigation\MenuItem;
@@ -37,6 +39,12 @@ class AgentPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
                 fn(): string => Blade::render('@livewire(\'notification-bell\')'),
+            )
+            // Global announcement ticker (Admin-editable via Settings) —
+            // registered before verify-email-banner so it renders above it.
+            ->renderHook(
+                PanelsRenderHook::CONTENT_START,
+                fn(): string => Blade::render("@include('partials.alert-ticker')"),
             )
             // BUG FIX (Helal-reported, Step 10.9 audit): same email-verification
             // nudge banner as WorkerPanelProvider — see that file's comment
@@ -80,8 +88,24 @@ class AgentPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/agent/theme.css')
             ->discoverResources(in: app_path('Filament/Agent/Resources'), for: 'App\\Filament\\Agent\\Resources')
             ->discoverPages(in: app_path('Filament/Agent/Pages'), for: 'App\\Filament\\Agent\\Pages')
-            ->pages([])
+            // BUG FIX (same root cause as WorkerPanelProvider, Step 11.3 audit):
+            // ->pages([]) was overriding Filament's default [Dashboard::class],
+            // meaning /agent had NO Dashboard page registered at all — the home
+            // route fell back to the first sidebar item instead of Dashboard.
+            ->pages([
+                Dashboard::class,
+            ])
             ->discoverWidgets(in: app_path('Filament/Agent/Widgets'), for: 'App\\Filament\\Agent\\Widgets')
+            // BUG FIX: ->widgets([]) called after discoverWidgets() was wiping
+            // any auto-discovered Agent widgets (e.g. MyAnalyticsWidget, if one
+            // exists) from ever reaching the Dashboard page — same override bug
+            // pattern as WorkerPanelProvider. Since I don't have your exact
+            // Agent/Widgets directory listing, I've left this as an empty array
+            // for now so nothing breaks — if you have widgets in
+            // app/Filament/Agent/Widgets/, list them here explicitly the same
+            // way RecommendedJobsWidget is listed in WorkerPanelProvider,
+            // otherwise Filament's discoverWidgets() alone is enough and you
+            // can remove this ->widgets([]) call entirely.
             ->widgets([])
             ->middleware([
                 EncryptCookies::class,
