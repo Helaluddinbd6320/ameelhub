@@ -29,36 +29,30 @@ class PaymentAccountForm
                         ->label('Account লেবেল (Admin-এর জন্য)')
                         ->helperText('যেমন: "Chapai Main bKash" — শুধু Admin দেখবে')
                         ->required()
-                        ->stripTags()
                         ->maxLength(100),
 
                     TextInput::make('account_holder_name')
                         ->label('Account Holder Name')
                         ->required()
-                        ->stripTags()
                         ->maxLength(150),
 
                     TextInput::make('account_number')
                         ->label('Account Number')
                         ->required()
-                        ->stripTags()
                         ->maxLength(100),
 
                     TextInput::make('bank_name')
                         ->label('ব্যাংকের নাম')
-                        ->stripTags()
                         ->maxLength(100)
                         ->visible(fn ($get) => $get('payment_method') === 'bank'),
 
                     TextInput::make('branch_name')
                         ->label('শাখার নাম')
-                        ->stripTags()
                         ->maxLength(100)
                         ->visible(fn ($get) => $get('payment_method') === 'bank'),
 
                     TextInput::make('routing_or_iban')
                         ->label('Routing / IBAN')
-                        ->stripTags()
                         ->maxLength(100)
                         ->visible(fn ($get) => $get('payment_method') === 'bank'),
                 ]),
@@ -68,7 +62,6 @@ class PaymentAccountForm
                     Textarea::make('instructions_bn')
                         ->label('বিশেষ নির্দেশনা (Worker/Agent দেখবে)')
                         ->helperText('যেমন: "Send Money অপশনে পাঠান, Cash In/Payment না"')
-                        ->stripTags()
                         ->rows(3)
                         ->maxLength(500),
                 ]),
