@@ -41,6 +41,14 @@ class WorkerPanelProvider extends PanelProvider
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
                 fn(): string => Blade::render('@livewire(\'notification-bell\')'),
             )
+            // Global announcement ticker (Admin-editable via Settings →
+            // ঘোষণা টিকার tab: alert_ticker_enabled / alert_ticker_message /
+            // alert_ticker_whatsapp). Registered BEFORE verify-email-banner
+            // so it renders above it in every page's content area.
+            ->renderHook(
+                PanelsRenderHook::CONTENT_START,
+                fn(): string => Blade::render("@include('partials.alert-ticker')"),
+            )
             // BUG FIX (Helal-reported, Step 10.9 audit): email-verification
             // nudge banner. Login/panel access intentionally stays open for
             // unverified users (business decision) — this just renders a
