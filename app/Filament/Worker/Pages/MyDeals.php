@@ -16,6 +16,7 @@ class MyDeals extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
+    
     protected string $view = 'filament.worker.pages.my-deals';
 
     /** মডাল কনফার্মেশনের জন্য নির্বাচিত মাইলস্টোন আইডি */

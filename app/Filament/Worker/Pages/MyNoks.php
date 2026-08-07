@@ -16,6 +16,7 @@ use UnitEnum;
 class MyNoks extends Page
 {
     use WithPagination;
+    
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-bell-alert';
 

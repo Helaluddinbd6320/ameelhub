@@ -348,4 +348,5 @@ class MyProfile extends Page implements HasForms
 
         $this->redirect(static::getUrl());
     }
+    
 }
