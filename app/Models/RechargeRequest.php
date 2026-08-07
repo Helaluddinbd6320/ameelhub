@@ -51,4 +51,9 @@ class RechargeRequest extends Model
     {
         return $this->status === 'pending';
     }
+
+    public function paymentAccount(): BelongsTo
+{
+    return $this->belongsTo(PaymentAccount::class);
+}
 }

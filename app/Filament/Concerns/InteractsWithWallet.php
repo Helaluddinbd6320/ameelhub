@@ -3,6 +3,7 @@
 namespace App\Filament\Concerns;
 
 use App\Exceptions\WalletException;
+use App\Models\PaymentAccount;
 use App\Models\RechargeRequest;
 use App\Models\WalletTransaction;
 use App\Models\WithdrawalRequest;
@@ -38,6 +39,9 @@ trait InteractsWithWallet
     /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile|null */
     public $proofFile = null;
 
+    // Admin কোন account-এ টাকা পাঠানো হয়েছে তা নির্বাচন করার জন্য
+    public ?int $selectedPaymentAccountId = null;
+
     // ─── Filter State ──────────────────────────────────────────────────
 
     public string $filterType = '';
@@ -66,9 +70,14 @@ trait InteractsWithWallet
         return [
             'rechargeAmount'         => ['required', 'numeric', 'min:1'],
             'rechargePaymentMethod'  => ['required', 'in:bank,bkash,nagad,stcpay,cash'],
-            // অন্তত একটা থাকতেই হবে — রেফারেন্স নম্বর অথবা প্রুফ স্ক্রিনশট।
-            // দুটোই না থাকলে Admin ম্যানুয়ালি ব্যাংক/বিকাশ স্টেটমেন্টে
-            // মিলিয়ে verify করতে পারবেন না।
+            // cash বাদে বাকি সব মাধ্যমে admin-এর কোন account-এ পাঠানো হয়েছে
+            // তা নির্বাচন বাধ্যতামূলক — reconciliation এর জন্য জরুরি।
+            'selectedPaymentAccountId' => [
+                'nullable',
+                'required_unless:rechargePaymentMethod,cash',
+                'integer',
+                'exists:payment_accounts,id',
+            ],
             'referenceNumber'        => ['nullable', 'required_without:proofFile', 'string', 'max:100'],
             'proofFile'              => ['nullable', 'required_without:referenceNumber', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ];
@@ -77,13 +86,14 @@ trait InteractsWithWallet
     protected function rechargeMessages(): array
     {
         return [
-            'rechargeAmount.required'          => 'পরিমাণ লিখুন।',
-            'rechargeAmount.numeric'           => 'পরিমাণ অবশ্যই সংখ্যা হতে হবে।',
-            'rechargePaymentMethod.required'   => 'একটি মাধ্যম নির্বাচন করুন।',
-            'referenceNumber.required_without' => 'রেফারেন্স নম্বর অথবা প্রুফ স্ক্রিনশট — অন্তত একটা দিন।',
-            'proofFile.required_without'       => 'প্রুফ স্ক্রিনশট অথবা রেফারেন্স নম্বর — অন্তত একটা দিন।',
-            'proofFile.mimes'                  => 'শুধু JPG, PNG অথবা PDF ফাইল দেওয়া যাবে।',
-            'proofFile.max'                    => 'ফাইলের আকার সর্বোচ্চ 5MB হতে হবে।',
+            'rechargeAmount.required'           => 'পরিমাণ লিখুন।',
+            'rechargeAmount.numeric'            => 'পরিমাণ অবশ্যই সংখ্যা হতে হবে।',
+            'rechargePaymentMethod.required'    => 'একটি মাধ্যম নির্বাচন করুন।',
+            'selectedPaymentAccountId.required_unless' => 'কোন Account-এ টাকা পাঠিয়েছেন তা নির্বাচন করুন।',
+            'referenceNumber.required_without'  => 'রেফারেন্স নম্বর অথবা প্রুফ স্ক্রিনশট — অন্তত একটা দিন।',
+            'proofFile.required_without'        => 'প্রুফ স্ক্রিনশট অথবা রেফারেন্স নম্বর — অন্তত একটা দিন।',
+            'proofFile.mimes'                   => 'শুধু JPG, PNG অথবা PDF ফাইল দেওয়া যাবে।',
+            'proofFile.max'                     => 'ফাইলের আকার সর্বোচ্চ 5MB হতে হবে।',
         ];
     }
 
@@ -135,6 +145,16 @@ trait InteractsWithWallet
             ->where('user_id', Auth::id())
             ->whereDate('created_at', today())
             ->count();
+    }
+
+    /** সিলেক্টেড payment method-এর জন্য admin-এর active account গুলো */
+    public function getAvailablePaymentAccountsProperty()
+    {
+        if (! $this->rechargePaymentMethod || $this->rechargePaymentMethod === 'cash') {
+            return collect();
+        }
+
+        return PaymentAccount::activeForMethod($this->rechargePaymentMethod)->get();
     }
 
     /** Filter dropdown-এ দেখানোর জন্য সব transaction type + বাংলা লেবেল */
@@ -197,7 +217,7 @@ trait InteractsWithWallet
 
     public function openRechargeModal(): void
     {
-        $this->reset(['rechargeAmount', 'rechargePaymentMethod', 'referenceNumber', 'proofFile']);
+        $this->reset(['rechargeAmount', 'rechargePaymentMethod', 'referenceNumber', 'proofFile', 'selectedPaymentAccountId']);
         $this->resetErrorBag();
         $this->isRecharging = true;
     }
@@ -205,7 +225,7 @@ trait InteractsWithWallet
     public function closeRechargeModal(): void
     {
         $this->isRecharging = false;
-        $this->reset(['rechargeAmount', 'rechargePaymentMethod', 'referenceNumber', 'proofFile']);
+        $this->reset(['rechargeAmount', 'rechargePaymentMethod', 'referenceNumber', 'proofFile', 'selectedPaymentAccountId']);
         $this->resetErrorBag();
     }
 
@@ -251,10 +271,6 @@ trait InteractsWithWallet
             $proofPath = null;
 
             if ($this->proofFile) {
-                // L10 file upload security: ULID filename, MIME already
-                // whitelisted by validate() above, stored on the private
-                // disk (not publicly symlinked) — same pattern as agent
-                // verification documents.
                 $ulid = (string) Str::ulid();
                 $extension = $this->proofFile->getClientOriginalExtension();
 
@@ -270,7 +286,8 @@ trait InteractsWithWallet
                 (float) $validated['rechargeAmount'],
                 $validated['rechargePaymentMethod'],
                 $validated['referenceNumber'] ?? null,
-                $proofPath
+                $proofPath,
+                $validated['selectedPaymentAccountId'] ?? null
             );
 
             Notification::make()
@@ -342,7 +359,14 @@ trait InteractsWithWallet
 
     public function updatedRechargePaymentMethod(): void
     {
-        $this->resetErrorBag('rechargePaymentMethod');
+        // মাধ্যম পাল্টালে আগের সিলেক্ট করা account আর প্রাসঙ্গিক না
+        $this->selectedPaymentAccountId = null;
+        $this->resetErrorBag(['rechargePaymentMethod', 'selectedPaymentAccountId']);
+    }
+
+    public function updatedSelectedPaymentAccountId(): void
+    {
+        $this->resetErrorBag('selectedPaymentAccountId');
     }
 
     public function updatedReferenceNumber(): void
