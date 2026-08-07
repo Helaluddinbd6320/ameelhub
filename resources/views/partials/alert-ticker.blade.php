@@ -11,7 +11,7 @@
                 {{ $tickerMessage }}
                 @if($tickerWhatsapp)
                     
-                        href="https://wa.me/{{ preg_replace('/\D/', '', $tickerWhatsapp) }}"
+                        <a href="https://wa.me/{{ preg_replace('/\D/', '', $tickerWhatsapp) }}"
                         target="_blank"
                         rel="noopener"
                         class="ameelhub-ticker__link"
@@ -25,7 +25,7 @@
                 {{ $tickerMessage }}
                 @if($tickerWhatsapp)
                     
-                        href="https://wa.me/{{ preg_replace('/\D/', '', $tickerWhatsapp) }}"
+                       <a href="https://wa.me/{{ preg_replace('/\D/', '', $tickerWhatsapp) }}"
                         target="_blank"
                         rel="noopener"
                         class="ameelhub-ticker__link"
