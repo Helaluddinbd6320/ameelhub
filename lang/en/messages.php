@@ -528,5 +528,12 @@ return [
     'heading' => 'Best Jobs For You',
     'empty' => 'No matching jobs found for your profile right now. Completing your CV will improve your results.',
     'match_percentage' => ':percent% match',
+
+    'select_account' => 'Select which account you sent the payment to',
+'no_accounts_available' => 'No active account available for this method right now. Please choose another method or contact Admin.',
+
+],
+'guest' => [
+    'license_line' => 'License No. 0016205 · Government-approved recruitment agency',
 ],
 ];

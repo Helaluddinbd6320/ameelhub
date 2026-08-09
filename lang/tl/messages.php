@@ -520,5 +520,10 @@ return [
         'heading' => 'Pinakamahusay na Trabaho Para sa Inyo',
         'empty' => 'Walang tumugmang trabaho sa inyong profile sa ngayon. Ang pagkumpleto ng inyong CV ay magpapabuti sa inyong resulta.',
         'match_percentage' => ':percent% tugma',
+        'select_account' => 'Piliin kung saang account mo ipinadala ang bayad',
+        'no_accounts_available' => 'Walang aktibong account sa ngayon para sa paraang ito. Pumili ng ibang paraan o makipag-ugnayan sa Admin.',
+    ],
+    'guest' => [
+        'license_line' => 'Lisensya Blg. 0016205 · Ahensya ng pagre-recruit na inaprubahan ng gobyerno',
     ],
 ];

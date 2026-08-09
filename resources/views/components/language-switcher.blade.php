@@ -13,7 +13,7 @@
     render correctly. --}}
     <x-dropdown align="right" width="40">
         <x-slot name="trigger">
-            <button class="inline-flex items-center gap-1 px-2.5 py-1.5 border border-gray-200 text-xs font-medium rounded-md text-gray-600 bg-white hover:text-gray-800 hover:bg-gray-50 focus:outline-none transition ease-in-out duration-150">
+            <button type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 border border-gray-200 text-xs font-medium rounded-md text-gray-600 bg-white hover:text-gray-800 hover:bg-gray-50 focus:outline-none transition ease-in-out duration-150">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.5 7a10.05 10.05 0 01-4.412 6.5" />
@@ -38,7 +38,7 @@
 @else
     <x-dropdown align="right" width="40">
         <x-slot name="trigger">
-            <button class="inline-flex items-center gap-1 px-3 py-2 border border-gray-200 text-sm leading-4 font-medium rounded-md text-gray-600 bg-white hover:text-gray-800 hover:bg-gray-50 focus:outline-none transition ease-in-out duration-150">
+            <button type="button" class="inline-flex items-center gap-1 px-3 py-2 border border-gray-200 text-sm leading-4 font-medium rounded-md text-gray-600 bg-white hover:text-gray-800 hover:bg-gray-50 focus:outline-none transition ease-in-out duration-150">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.5 7a10.05 10.05 0 01-4.412 6.5" />

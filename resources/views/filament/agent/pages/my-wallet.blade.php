@@ -118,10 +118,10 @@
             class="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/60 backdrop-blur-sm p-4"
             wire:key="recharge-modal"
         >
-            <div class="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 shadow-2xl ring-1 ring-gray-950/5 dark:ring-white/10 overflow-hidden">
+            <div class="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 shadow-2xl ring-1 ring-gray-950/5 dark:ring-white/10 overflow-hidden max-h-[90vh] flex flex-col">
 
                 {{-- Header --}}
-                <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+                <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-800 shrink-0">
                     <div class="flex items-center gap-3">
                         <div class="flex h-10 w-10 items-center justify-center rounded-full bg-success-50 dark:bg-success-500/10">
                             @svg('heroicon-o-arrow-down-tray', 'h-5 w-5 text-success-600 dark:text-success-400')
@@ -143,7 +143,7 @@
                 </div>
 
                 {{-- Body --}}
-                <div class="px-6 py-5 space-y-5">
+                <div class="px-6 py-5 space-y-5 overflow-y-auto">
 
                     {{-- Amount --}}
                     <div>
@@ -178,7 +178,7 @@
                             {{ __('messages.wallet.payment_method_used') }}
                         </label>
                         <select
-                            wire:model="rechargePaymentMethod"
+                            wire:model.live="rechargePaymentMethod"
                             class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-sm py-2.5 focus:border-success-500 focus:ring-success-500 transition
                                 @error('rechargePaymentMethod') border-danger-400 focus:border-danger-500 focus:ring-danger-500 @enderror"
                         >
@@ -196,6 +196,68 @@
                             </p>
                         @enderror
                     </div>
+
+                    {{-- Payment Account Selection (dynamic on selected method) --}}
+                    @if($rechargePaymentMethod && $rechargePaymentMethod !== 'cash')
+                        <div wire:key="payment-account-block">
+                            <label class="block text-sm font-medium text-gray-950 dark:text-white mb-1.5">
+                                {{ __('messages.wallet.select_account') }}
+                            </label>
+
+                            @if($this->availablePaymentAccounts->isEmpty())
+                                <p class="flex items-center gap-1 text-xs text-danger-600">
+                                    @svg('heroicon-o-exclamation-triangle', 'h-3.5 w-3.5 shrink-0')
+                                    {{ __('messages.wallet.no_accounts_available') }}
+                                </p>
+                            @else
+                                <div class="space-y-2">
+                                    @foreach($this->availablePaymentAccounts as $account)
+                                        <label
+                                            wire:key="pa-{{ $account->id }}"
+                                            class="flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition
+                                                {{ (string) $selectedPaymentAccountId === (string) $account->id
+                                                    ? 'border-success-500 bg-success-50 dark:bg-success-500/10'
+                                                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600' }}"
+                                        >
+                                            <input
+                                                type="radio"
+                                                wire:model.live="selectedPaymentAccountId"
+                                                value="{{ $account->id }}"
+                                                class="mt-1 shrink-0 text-success-600 focus:ring-success-500"
+                                            />
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-semibold text-gray-950 dark:text-white">
+                                                    {{ $account->account_holder_name }}
+                                                </p>
+                                                <p class="text-sm text-gray-700 dark:text-gray-300 font-mono">
+                                                    {{ $account->account_number }}
+                                                </p>
+                                                @if($account->bank_name)
+                                                    <p class="text-xs text-gray-500 mt-0.5">
+                                                        {{ $account->bank_name }}
+                                                        @if($account->branch_name) — {{ $account->branch_name }} @endif
+                                                        @if($account->routing_or_iban) &middot; {{ $account->routing_or_iban }} @endif
+                                                    </p>
+                                                @endif
+                                                @if($account->instructions_bn)
+                                                    <p class="text-xs text-warning-600 mt-1">
+                                                        {{ $account->instructions_bn }}
+                                                    </p>
+                                                @endif
+                                            </div>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            @error('selectedPaymentAccountId')
+                                <p class="flex items-center gap-1 text-xs text-danger-600 mt-1.5">
+                                    @svg('heroicon-o-exclamation-circle', 'h-3.5 w-3.5 shrink-0')
+                                    {{ $message }}
+                                </p>
+                            @enderror
+                        </div>
+                    @endif
 
                     {{-- Reference Number --}}
                     <div>
@@ -259,7 +321,7 @@
                 </div>
 
                 {{-- Footer --}}
-                <div class="flex justify-end gap-2 px-6 py-4 bg-gray-50 dark:bg-gray-800/40 border-t border-gray-100 dark:border-gray-800">
+                <div class="flex justify-end gap-2 px-6 py-4 bg-gray-50 dark:bg-gray-800/40 border-t border-gray-100 dark:border-gray-800 shrink-0">
                     <x-filament::button color="gray" wire:click="closeRechargeModal">
                         {{ __('messages.wallet.cancel') }}
                     </x-filament::button>
