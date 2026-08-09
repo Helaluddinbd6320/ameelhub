@@ -33,9 +33,19 @@ class WorkerPanelProvider extends PanelProvider
             // Step: new-locales — registered before notification-bell so it
             // renders to the left of it in the topbar (DOM order = visual
             // order in this flex row), including on mobile.
+            //
+            // BUG FIX (Helal-reported): dropdown opened and immediately
+            // closed itself on click. Root cause — this render hook lives
+            // inside Filament's page, which is itself a Livewire component.
+            // notification-bell polls periodically, and every Livewire
+            // re-render/morph cycle was recreating this node, wiping out
+            // Alpine's x-data="{ open: false }" state right after the click
+            // set it to true. Wrapping in wire:ignore tells Livewire to never
+            // touch this subtree on re-render, so Alpine fully owns it and
+            // the open state survives polling cycles.
             ->renderHook(
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
-                fn(): string => Blade::render('<x-language-switcher />'),
+                fn(): string => Blade::render('<div wire:ignore><x-language-switcher /></div>'),
             )
             ->renderHook(
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
