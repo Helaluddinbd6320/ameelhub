@@ -34,18 +34,33 @@ class WorkerPanelProvider extends PanelProvider
             // renders to the left of it in the topbar (DOM order = visual
             // order in this flex row), including on mobile.
             //
-            // BUG FIX (Helal-reported): dropdown opened and immediately
-            // closed itself on click. Root cause — this render hook lives
-            // inside Filament's page, which is itself a Livewire component.
-            // notification-bell polls periodically, and every Livewire
-            // re-render/morph cycle was recreating this node, wiping out
-            // Alpine's x-data="{ open: false }" state right after the click
-            // set it to true. Wrapping in wire:ignore tells Livewire to never
-            // touch this subtree on re-render, so Alpine fully owns it and
-            // the open state survives polling cycles.
+            // BUG FIX (Helal-reported, round 1): dropdown opened and
+            // immediately closed itself on click. Root cause — this render
+            // hook lives inside Filament's page, which is itself a Livewire
+            // component. notification-bell polls periodically, and every
+            // Livewire re-render/morph cycle was recreating this node,
+            // wiping out Alpine's x-data="{ open: false }" state right
+            // after the click set it to true. wire:ignore tells Livewire to
+            // never touch this subtree on re-render, so Alpine fully owns
+            // it and the open state survives polling cycles.
+            //
+            // BUG FIX (Helal-reported, round 2): after the above fix, the
+            // dropdown opened and worked (language switch on click actually
+            // navigated correctly), but the open panel rendered BEHIND the
+            // alert-ticker bar (CONTENT_START hook) instead of on top of it.
+            // Both live inside Filament's own topbar/content stacking
+            // context, where the ticker's DOM position (added later in the
+            // page) was winning the stacking order despite dropdown.blade's
+            // own z-50. Public-site pages don't have this issue because the
+            // ticker there sits in the plain page layout, not inside
+            // Filament's topbar stacking context. Giving this wrapper its
+            // own very high z-index resolves it scoped to just this panel
+            // element, without touching dropdown.blade.php or
+            // alert-ticker.blade.php (which are shared with the public
+            // site and must stay untouched).
             ->renderHook(
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
-                fn(): string => Blade::render('<div wire:ignore><x-language-switcher /></div>'),
+                fn(): string => Blade::render('<div wire:ignore class="relative z-[9999]"><x-language-switcher /></div>'),
             )
             ->renderHook(
                 PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
