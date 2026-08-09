@@ -28,6 +28,13 @@
     </head>
     <body class="font-sans antialiased @if(app()->getLocale() === 'ur') font-urdu @endif">
         <div class="min-h-screen bg-gray-100">
+
+            {{-- Global announcement ticker (Admin-editable via Admin →
+            সেটিংস → ঘোষণা টিকার). Same partial + same Setting keys used
+            in Worker/Agent Filament panels — placed above the nav bar
+            here so it's visible before any auth/dashboard chrome loads. --}}
+            @include('partials.alert-ticker')
+
             @include('layouts.navigation')
 
             <!-- Page Heading -->

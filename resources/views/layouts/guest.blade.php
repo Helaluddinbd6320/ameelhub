@@ -17,6 +17,11 @@
 
 <body class="antialiased" style="font-family: 'Hind Siliguri', sans-serif;">
 
+    {{-- Global announcement ticker (Admin-editable via Admin →
+    সেটিংস → ঘোষণা টিকার). Same partial + same Setting keys used in
+    layouts/app.blade.php and Worker/Agent Filament panels. --}}
+    @include('partials.alert-ticker')
+
     {{-- ============ NAV BAR ============ --}}
     <nav x-data="{ open: false }" class="bg-white border-b border-gray-100 relative z-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,13 +38,13 @@
                             class="inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors"
                             style="color:#4b5563;" onmouseover="this.style.color='#0B4F3F'"
                             onmouseout="this.style.color='#4b5563'">
-                            কর্মীদের তালিকা
+                            {{ __('messages.nav.workers_list') }}
                         </a>
                         <a href="{{ route('jobs.index') }}"
                             class="inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors"
                             style="color:#4b5563;" onmouseover="this.style.color='#0B4F3F'"
                             onmouseout="this.style.color='#4b5563'">
-                            জব দেখুন
+                            {{ __('messages.nav.view_jobs') }}
                         </a>
                     </div>
                 </div>
@@ -49,12 +54,12 @@
                         style="color:{{ request()->routeIs('login') ? '#0B4F3F' : '#4b5563' }};"
                         onmouseover="this.style.color='#0B4F3F'"
                         onmouseout="this.style.color='{{ request()->routeIs('login') ? '#0B4F3F' : '#4b5563' }}'">
-                        লগইন
+                        {{ __('messages.nav.login') }}
                     </a>
                     <a href="{{ route('register') }}"
                         class="text-sm font-semibold rounded-lg px-4 py-2 transition-colors"
                         style="background-color:{{ request()->routeIs('register') ? '#0B4F3F' : '#C9974C' }}; color:{{ request()->routeIs('register') ? '#ffffff' : '#0B4F3F' }};">
-                        রেজিস্ট্রেশন
+                        {{ __('messages.nav.register') }}
                     </a>
                 </div>
 
@@ -76,16 +81,21 @@
 
         <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden border-t border-gray-100">
             <div class="pt-2 pb-3 space-y-1 px-4">
-                <a href="{{ route('workers.index') }}" class="block py-2 text-sm font-medium text-gray-600">কর্মীদের
-                    তালিকা</a>
-                <a href="{{ route('jobs.index') }}" class="block py-2 text-sm font-medium text-gray-600">জব দেখুন</a>
+                <a href="{{ route('workers.index') }}" class="block py-2 text-sm font-medium text-gray-600">
+                    {{ __('messages.nav.workers_list') }}
+                </a>
+                <a href="{{ route('jobs.index') }}" class="block py-2 text-sm font-medium text-gray-600">
+                    {{ __('messages.nav.view_jobs') }}
+                </a>
             </div>
             <div class="pt-3 pb-4 border-t border-gray-100 px-4 space-y-2">
-                <a href="{{ route('login') }}" class="block py-2 text-sm font-medium text-gray-600">লগইন</a>
+                <a href="{{ route('login') }}" class="block py-2 text-sm font-medium text-gray-600">
+                    {{ __('messages.nav.login') }}
+                </a>
                 <a href="{{ route('register') }}"
                     class="block text-center text-sm font-semibold rounded-lg px-4 py-2.5"
                     style="background-color:#C9974C; color:#0B4F3F;">
-                    রেজিস্ট্রেশন
+                    {{ __('messages.nav.register') }}
                 </a>
             </div>
         </div>
@@ -109,7 +119,7 @@
         </div>
 
         <p class="relative z-10 mt-6 text-xs text-white/45 text-center">
-            লাইসেন্স নং ০০১৬২০৫ · সরকার অনুমোদিত রিক্রুটিং এজেন্সি
+            {{ __('messages.guest.license_line') }}
         </p>
     </div>
 
