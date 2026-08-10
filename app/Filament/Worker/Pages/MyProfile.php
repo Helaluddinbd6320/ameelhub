@@ -111,7 +111,7 @@ class MyProfile extends Page implements HasForms
                                     Select::make('blood_group')
                                         ->label('রক্তের গ্রুপ')
                                         ->options(array_combine(
-                                            $bg = ['A+','A-','B+','B-','AB+','AB-','O+','O-'],
+                                            $bg = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
                                             $bg
                                         )),
                                     TextInput::make('height_cm')
@@ -126,6 +126,7 @@ class MyProfile extends Page implements HasForms
                                 FileUpload::make('photo')
                                     ->label('প্রোফাইল ছবি')
                                     ->image()
+                                    ->required()
                                     ->maxSize(2048)
                                     ->directory('worker-photos')
                                     ->visibility('public'),
@@ -161,7 +162,9 @@ class MyProfile extends Page implements HasForms
                             ->schema([
                                 Section::make('পাসপোর্ট')->schema([
                                     Grid::make(2)->schema([
-                                        TextInput::make('passport_number')->label('পাসপোর্ট নম্বর'),
+                                        TextInput::make('passport_number')
+                                            ->required()
+                                            ->label('পাসপোর্ট নম্বর'),
                                         TextInput::make('passport_issue_place')->label('ইস্যু স্থান'),
                                         DatePicker::make('passport_issue_date')->label('ইস্যু তারিখ'),
                                         DatePicker::make('passport_expiry')->label('মেয়াদ শেষ তারিখ'),
@@ -184,7 +187,9 @@ class MyProfile extends Page implements HasForms
                             ->schema([
                                 Grid::make(2)->schema([
                                     TextInput::make('phone_primary')->label('প্রাইমারি ফোন')->tel()->required(),
-                                    TextInput::make('phone_whatsapp')->label('WhatsApp নম্বর')->tel(),
+                                    TextInput::make('phone_whatsapp')
+                                        ->required()
+                                        ->label('WhatsApp নম্বর')->tel(),
                                     TextInput::make('phone_saudi')->label('সৌদি নম্বর')->tel(),
                                     TextInput::make('email_personal')->label('ব্যক্তিগত ইমেইল')->email(),
                                 ]),
@@ -195,7 +200,7 @@ class MyProfile extends Page implements HasForms
                                 Grid::make(2)->schema([
                                     Select::make('skill_category_id')
                                         ->label('প্রধান পেশা')
-                                        ->options(fn () => SkillCategory::query()
+                                        ->options(fn() => SkillCategory::query()
                                             ->where('is_active', true)
                                             ->orderBy('sort_order')
                                             ->pluck('name_bn', 'id'))
@@ -217,14 +222,14 @@ class MyProfile extends Page implements HasForms
                                     TextInput::make('education_details')->label('পাশের বছর ও বিষয়'),
                                     Select::make('arabic_level')
                                         ->label('আরবি দক্ষতা')
-                                        ->options(['none'=>'নেই','basic'=>'বেসিক','intermediate'=>'মাধ্যম','fluent'=>'সাবলীল']),
+                                        ->options(['none' => 'নেই', 'basic' => 'বেসিক', 'intermediate' => 'মাধ্যম', 'fluent' => 'সাবলীল']),
                                     Select::make('english_level')
                                         ->label('ইংরেজি দক্ষতা')
-                                        ->options(['none'=>'নেই','basic'=>'বেসিক','intermediate'=>'মাধ্যম','fluent'=>'সাবলীল']),
+                                        ->options(['none' => 'নেই', 'basic' => 'বেসিক', 'intermediate' => 'মাধ্যম', 'fluent' => 'সাবলীল']),
                                     Toggle::make('driving_license')->label('ড্রাইভিং লাইসেন্স আছে?')->live(),
                                     TextInput::make('driving_license_type')
                                         ->label('লাইসেন্সের ধরন')
-                                        ->visible(fn ($get) => $get('driving_license')),
+                                        ->visible(fn($get) => $get('driving_license')),
                                     TextInput::make('computer_skills')->label('কম্পিউটার দক্ষতা'),
                                     TextInput::make('other_skills')->label('অন্যান্য দক্ষতা'),
                                 ]),
@@ -239,7 +244,7 @@ class MyProfile extends Page implements HasForms
                                     Toggle::make('is_in_saudi')->label('সৌদিতে আছেন কিনা')->live(),
                                     TextInput::make('present_location_city')
                                         ->label('বর্তমান শহর')
-                                        ->visible(fn ($get) => $get('is_in_saudi')),
+                                        ->visible(fn($get) => $get('is_in_saudi')),
                                     Select::make('visa_status')
                                         ->label('ভিসা স্ট্যাটাস')
                                         ->options([
@@ -269,23 +274,29 @@ class MyProfile extends Page implements HasForms
             ->statePath('data');
     }
 
-    protected function getFormActions(): array
-    {
-        return [
-            Action::make('save')
-                ->label('সংরক্ষণ করুন (Draft)')
-                ->action('saveDraft')
-                ->visible(fn () => !$this->isFormDisabled()),
+   protected function getFormActions(): array
+{
+    return [
+        Action::make('save')
+            ->label('সংরক্ষণ করুন (Draft)')
+            ->action('saveDraft')
+            ->visible(fn() => !$this->isFormDisabled()),
 
-            Action::make('submit')
-                ->label('আবেদন জমা দিন')
-                ->color('success')
-                ->requiresConfirmation()
-                ->modalDescription('জমা দিলে আপনার ওয়ালেট থেকে ১০ SAR কাটা হবে। আপনি কি নিশ্চিত?')
-                ->action('submitForApproval')
-                ->visible(fn () => in_array($this->worker->status, ['draft', 'rejected'])),
-        ];
-    }
+        Action::make('submit')
+            ->label('আবেদন জমা দিন')
+            ->color('success')
+            ->requiresConfirmation()
+            ->modalDescription(function () {
+                $fee = (float) (\App\Models\Setting::where('key', 'cv_approval_fee')->value('value') ?? 10);
+
+                return $fee > 0
+                    ? "জমা দিলে আপনার ওয়ালেট থেকে {$fee} SAR কাটা হবে। আপনি কি নিশ্চিত?"
+                    : 'জমা দিলে এখন কোনো ফি কাটা হবে না। আপনি কি নিশ্চিত?';
+            })
+            ->action('submitForApproval')
+            ->visible(fn() => in_array($this->worker->status, ['draft', 'rejected'])),
+    ];
+}
 
     public function saveDraft(): void
     {
@@ -348,5 +359,4 @@ class MyProfile extends Page implements HasForms
 
         $this->redirect(static::getUrl());
     }
-    
 }
