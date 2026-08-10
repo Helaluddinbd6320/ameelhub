@@ -6,6 +6,7 @@ use App\Models\AgentNok;
 use App\Models\ContactReveal;
 use App\Models\CvView;
 use App\Models\JobPost;
+use App\Models\Setting;
 use App\Models\Worker;
 use App\Services\ContactRevealService;
 use App\Services\NokService;
@@ -82,6 +83,16 @@ class WorkerProfile extends Component
         } catch (\Throwable $e) {
             session()->flash('error', 'পর্যাপ্ত ব্যালেন্স নেই। Wallet রিচার্জ করুন।');
         }
+    }
+
+    /**
+     * সেটিং থেকে dynamic contact reveal fee — hardcoded "5 SAR" এর বদলে
+     * ব্লেডে এটা ব্যবহার হয় (Contact Info badge + View বাটনে)।
+     * Setting::get() cache-wrapped, তাই বারবার কল করলেও পারফরম্যান্স সমস্যা নেই।
+     */
+    public function getContactRevealFeeProperty(): float
+    {
+        return (float) Setting::get('contact_reveal_fee');
     }
 
     public function getYoutubeEmbedUrlProperty(): ?string
@@ -211,7 +222,7 @@ class WorkerProfile extends Component
 
     public function render()
     {
-        // ক্যাটাগরি আইডি এবং বর্তমান ওয়ার্কার আইডি আলাদা করে কুয়েরি অপ্টিমাইজ করা হয়েছে
+        // ক্যাটাগরি আইডি এবং বর্তমান ওয়ার্কার আইডি আলাদা করে কুয়েরি অপ্টিমাইজ করা হয়েছে
         $categoryId = $this->worker->skill_category_id;
         $currentWorkerId = $this->worker->id;
 

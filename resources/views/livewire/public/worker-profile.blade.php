@@ -145,7 +145,7 @@
             <div class="border-t border-slate-100 px-6 sm:px-8 py-6">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-bold text-slate-900" style="font-family: 'Noto Serif Bengali', serif;">{{ __('messages.worker_profile.contact_info') }}</h2>
-                    <span class="text-xs text-slate-400 bg-slate-50 px-2.5 py-1 rounded-full ring-1 ring-slate-100">{{ __('messages.worker_profile.per_number_fee') }}</span>
+                    <span class="text-xs text-slate-400 bg-slate-50 px-2.5 py-1 rounded-full ring-1 ring-slate-100">{{ __('messages.worker_profile.per_number_fee', ['fee' => $this->contactRevealFee]) }}</span>
                 </div>
 
                 <div class="grid sm:grid-cols-2 gap-3">
@@ -173,7 +173,7 @@
                                             wire:loading.attr="disabled"
                                             wire:target="revealPhone('{{ $type }}')"
                                             class="text-sm font-semibold text-white bg-emerald-800 hover:bg-emerald-900 active:scale-95 disabled:opacity-50 rounded-xl px-4 py-2 shrink-0 transition-all shadow-sm shadow-emerald-800/20">
-                                        <span wire:loading.remove wire:target="revealPhone('{{ $type }}')">{{ __('messages.worker_profile.view_fee') }}</span>
+                                        <span wire:loading.remove wire:target="revealPhone('{{ $type }}')">{{ __('messages.worker_profile.view_fee', ['fee' => $this->contactRevealFee]) }}</span>
                                         <span wire:loading wire:target="revealPhone('{{ $type }}')">{{ __('messages.worker_profile.please_wait') }}</span>
                                     </button>
                                 @else
