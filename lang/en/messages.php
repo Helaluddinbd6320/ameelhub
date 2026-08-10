@@ -99,12 +99,12 @@ return [
         ],
 
 
-       
+
 
 
     ],
 
-     'workers_page' => [
+    'workers_page' => [
         'title' => 'Workers List',
         'all_skills' => 'All Skills',
         'all_visa_status' => 'All Visa Status',
@@ -144,11 +144,11 @@ return [
         'times' => 'times',
         'work_video' => 'Work Video',
         'contact_info' => 'Contact Information',
-        'per_number_fee' => '5 SAR per number',
+        'per_number_fee' => ':fee SAR per number',
         'primary_phone' => 'Primary Phone',
         'whatsapp_number' => 'WhatsApp Number',
         'saudi_number' => 'Saudi Number',
-        'view_fee' => 'View (5 SAR)',
+        'view_fee' => 'View (:fee SAR)',
         'please_wait' => 'Please wait...',
         'revealed' => 'Revealed',
         'guest_reveal_hint' => 'Log in to your account to view phone numbers.',
@@ -525,15 +525,15 @@ return [
         'no_selections_in_tab' => 'No selections in this tab.',
     ],
     'recommended_jobs' => [
-    'heading' => 'Best Jobs For You',
-    'empty' => 'No matching jobs found for your profile right now. Completing your CV will improve your results.',
-    'match_percentage' => ':percent% match',
+        'heading' => 'Best Jobs For You',
+        'empty' => 'No matching jobs found for your profile right now. Completing your CV will improve your results.',
+        'match_percentage' => ':percent% match',
 
-    'select_account' => 'Select which account you sent the payment to',
-'no_accounts_available' => 'No active account available for this method right now. Please choose another method or contact Admin.',
+        'select_account' => 'Select which account you sent the payment to',
+        'no_accounts_available' => 'No active account available for this method right now. Please choose another method or contact Admin.',
 
-],
-'guest' => [
-    'license_line' => 'License No. 0016205 · Government-approved recruitment agency',
-],
+    ],
+    'guest' => [
+        'license_line' => 'License No. 0016205 · Government-approved recruitment agency',
+    ],
 ];
