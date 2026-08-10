@@ -127,6 +127,7 @@ class MyProfile extends Page implements HasForms
                                 FileUpload::make('photo')
                                     ->label('প্রোফাইল ছবি')
                                     ->image()
+                                    ->required()
                                     ->maxSize(2048)
                                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                     ->disk('public')
