@@ -12,6 +12,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Str;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Section;
@@ -126,10 +127,20 @@ class MyProfile extends Page implements HasForms
                                 FileUpload::make('photo')
                                     ->label('প্রোফাইল ছবি')
                                     ->image()
-                                    ->required()
                                     ->maxSize(2048)
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                    ->disk('public')
                                     ->directory('worker-photos')
-                                    ->visibility('public'),
+                                    ->visibility('public')
+                                    ->dehydrated(true)
+                                    ->imageResizeMode('cover')
+                                    ->imageResizeTargetWidth('600')
+                                    ->imageResizeTargetHeight('600')
+                                    ->imageResizeUpscale(false)
+                                    ->getUploadedFileNameForStorageUsing(
+                                        fn($file) => Str::ulid() . '.' . $file->getClientOriginalExtension()
+                                    )
+                                    ->columnSpanFull(),
                             ]),
 
                         Tab::make('ঠিকানা')
@@ -274,29 +285,29 @@ class MyProfile extends Page implements HasForms
             ->statePath('data');
     }
 
-   protected function getFormActions(): array
-{
-    return [
-        Action::make('save')
-            ->label('সংরক্ষণ করুন (Draft)')
-            ->action('saveDraft')
-            ->visible(fn() => !$this->isFormDisabled()),
+    protected function getFormActions(): array
+    {
+        return [
+            Action::make('save')
+                ->label('সংরক্ষণ করুন (Draft)')
+                ->action('saveDraft')
+                ->visible(fn() => !$this->isFormDisabled()),
 
-        Action::make('submit')
-            ->label('আবেদন জমা দিন')
-            ->color('success')
-            ->requiresConfirmation()
-            ->modalDescription(function () {
-                $fee = (float) (\App\Models\Setting::where('key', 'cv_approval_fee')->value('value') ?? 10);
+            Action::make('submit')
+                ->label('আবেদন জমা দিন')
+                ->color('success')
+                ->requiresConfirmation()
+                ->modalDescription(function () {
+                    $fee = (float) (\App\Models\Setting::where('key', 'cv_approval_fee')->value('value') ?? 10);
 
-                return $fee > 0
-                    ? "জমা দিলে আপনার ওয়ালেট থেকে {$fee} SAR কাটা হবে। আপনি কি নিশ্চিত?"
-                    : 'জমা দিলে এখন কোনো ফি কাটা হবে না। আপনি কি নিশ্চিত?';
-            })
-            ->action('submitForApproval')
-            ->visible(fn() => in_array($this->worker->status, ['draft', 'rejected'])),
-    ];
-}
+                    return $fee > 0
+                        ? "জমা দিলে আপনার ওয়ালেট থেকে {$fee} SAR কাটা হবে। আপনি কি নিশ্চিত?"
+                        : 'জমা দিলে এখন কোনো ফি কাটা হবে না। আপনি কি নিশ্চিত?';
+                })
+                ->action('submitForApproval')
+                ->visible(fn() => in_array($this->worker->status, ['draft', 'rejected'])),
+        ];
+    }
 
     public function saveDraft(): void
     {
