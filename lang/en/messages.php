@@ -144,7 +144,7 @@ return [
         'times' => 'times',
         'work_video' => 'Work Video',
         'contact_info' => 'Contact Information',
-        'per_number_fee' => '(:fee SAR) per number',
+        'per_number_fee' => ':fee SAR per number',
         'primary_phone' => 'Primary Phone',
         'whatsapp_number' => 'WhatsApp Number',
         'saudi_number' => 'Saudi Number',
