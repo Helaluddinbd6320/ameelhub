@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\Worker;
 use App\Models\WalletTransaction;
@@ -20,7 +21,7 @@ class CvApprovalService
     // Fee Deduction (Worker submits CV for approval)
     // ─────────────────────────────────────────────
 
-    public function deductFee(Worker $worker): WalletTransaction
+    public function deductFee(Worker $worker): ?WalletTransaction
     {
         if ($worker->approval_fee_charged) {
             throw new RuntimeException('CV fee has already been charged for this worker.');
@@ -48,6 +49,31 @@ class CvApprovalService
         // Checked here rather than blocking login/panel access entirely.
         if (! $user->hasVerifiedEmail()) {
             throw new RuntimeException('CV জমা দেওয়ার আগে আপনার ইমেইল ভেরিফাই করতে হবে।');
+        }
+
+        // LAUNCH PROMO FIX: cv_approval_fee সেটিং ০ (বা negative) হলে
+        // wallet-এ কোনো transaction তৈরি না করে সরাসরি status pending
+        // করে দেওয়া হচ্ছে। approval_fee_charged ইচ্ছাকৃতভাবে false রাখা
+        // হয়েছে যেহেতু আসলে কোনো টাকা কাটা হয়নি — এতে fee পরে আবার
+        // চালু হলে "already charged" ভুল ব্লক হবে না, আর reject হলে
+        // ভুল refund চেষ্টাও হবে না।
+        $fee = (float) (Setting::where('key', 'cv_approval_fee')->value('value') ?? 10);
+
+        if ($fee <= 0) {
+            DB::transaction(function () use ($worker) {
+                $worker->forceFill([
+                    'approval_fee_charged' => false,
+                    'status'               => 'pending',
+                ])->save();
+            });
+
+            $this->notifications->cvSubmitted($worker->fresh());
+
+            Log::channel('daily')->info('Worker CV submitted with zero fee (promo)', [
+                'worker_id' => $worker->id,
+            ]);
+
+            return null;
         }
 
         $transaction = DB::transaction(function () use ($worker, $user) {
