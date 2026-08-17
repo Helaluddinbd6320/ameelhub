@@ -79,10 +79,14 @@ class MyWorkersForm
                             Select::make('blood_group')
                                 ->label('রক্তের গ্রুপ')
                                 ->options([
-                                    'A+' => 'A+', 'A-' => 'A-',
-                                    'B+' => 'B+', 'B-' => 'B-',
-                                    'AB+' => 'AB+', 'AB-' => 'AB-',
-                                    'O+' => 'O+', 'O-' => 'O-',
+                                    'A+' => 'A+',
+                                    'A-' => 'A-',
+                                    'B+' => 'B+',
+                                    'B-' => 'B-',
+                                    'AB+' => 'AB+',
+                                    'AB-' => 'AB-',
+                                    'O+' => 'O+',
+                                    'O-' => 'O-',
                                 ]),
                             TextInput::make('height_cm')
                                 ->label('উচ্চতা (সেমি)')
@@ -97,20 +101,18 @@ class MyWorkersForm
                             FileUpload::make('photo')
                                 ->label('প্রোফাইল ছবি')
                                 ->image()
-                                ->directory('worker-photos')
                                 ->maxSize(2048)
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                ->disk('public')
+                                ->directory('worker-photos')
                                 ->visibility('public')
-                                // Step 10.8e Fix: Admin WorkerForm-এর সাথে সামঞ্জস্যপূর্ণ করা হলো —
-                                // (1) browser-side (filepond) resize, কোনো সার্ভার-সাইড dependency
-                                //     ছাড়াই — বড় মোবাইল ফটোও এখন ৬০০×৬০০-এর মধ্যে সীমাবদ্ধ থাকবে।
-                                // (2) ULID filename — blueprint Section 9 / L10 security rule
-                                //     ("File uploads: ULID filename") অনুযায়ী, আগে এখানে missing ছিল।
+                                ->dehydrated(true)
                                 ->imageResizeMode('cover')
                                 ->imageResizeTargetWidth('600')
                                 ->imageResizeTargetHeight('600')
                                 ->imageResizeUpscale(false)
                                 ->getUploadedFileNameForStorageUsing(
-                                    fn ($file) => Str::ulid() . '.' . $file->getClientOriginalExtension()
+                                    fn($file) => Str::ulid() . '.' . $file->getClientOriginalExtension()
                                 )
                                 ->columnSpanFull(),
                         ])
@@ -205,7 +207,7 @@ class MyWorkersForm
                         ->schema([
                             Select::make('skill_category_id')
                                 ->label('প্রধান পেশা')
-                                ->options(fn () => SkillCategory::where('is_active', true)
+                                ->options(fn() => SkillCategory::where('is_active', true)
                                     ->orderBy('sort_order')
                                     ->pluck('name_bn', 'id')
                                     ->toArray())
@@ -258,7 +260,7 @@ class MyWorkersForm
                             TextInput::make('driving_license_type')
                                 ->label('লাইসেন্স টাইপ (Light/Heavy/Both)')
                                 ->maxLength(50)
-                                ->visible(fn ($get) => $get('driving_license')),
+                                ->visible(fn($get) => $get('driving_license')),
                             TextInput::make('computer_skills')
                                 ->label('কম্পিউটার দক্ষতা')
                                 ->maxLength(200),
@@ -312,17 +314,17 @@ class MyWorkersForm
                         ->schema([
                             Placeholder::make('status_display')
                                 ->label('বর্তমান স্ট্যাটাস')
-                                ->content(fn ($record) => $record?->status ?? '—'),
+                                ->content(fn($record) => $record?->status ?? '—'),
                             Placeholder::make('approved_at_display')
                                 ->label('অনুমোদনের তারিখ')
-                                ->content(fn ($record) => $record?->approved_at?->format('Y-m-d H:i') ?? '—'),
+                                ->content(fn($record) => $record?->approved_at?->format('Y-m-d H:i') ?? '—'),
                             Placeholder::make('rejection_reason_display')
                                 ->label('Rejection Reason')
-                                ->content(fn ($record) => $record?->rejection_reason ?? '—')
+                                ->content(fn($record) => $record?->rejection_reason ?? '—')
                                 ->columnSpanFull(),
                         ])
                         ->columns(2)
-                        ->visible(fn ($record) => $record !== null),
+                        ->visible(fn($record) => $record !== null),
                 ]),
         ]);
     }
