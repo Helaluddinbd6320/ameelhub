@@ -36,7 +36,7 @@ class Homepage extends Component
             ->whereIn('status', ['active', 'featured'])
             ->whereNotIn('id', $featuredWorkers->pluck('id'))
             ->inRandomOrder()
-            ->limit(8)
+            ->limit(16)
             ->get();
 
         // ── Active Job Posts: expired না, vacancy বাকি আছে, random ──
@@ -49,7 +49,7 @@ class Homepage extends Component
             })
             ->whereColumn('filled_count', '<', 'vacancies')
             ->inRandomOrder()
-            ->limit(8)
+            ->limit(16)
             ->get();
 
         return view('livewire.public.homepage', [
