@@ -10,7 +10,7 @@ class SkillCategoriesSeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            // --- আপনার আগের ৪০টি ক্যাটাগরি (অবিকল অপরিবর্তিত রাখা হয়েছে) ---
+            // --- ১. আপনার আগের ৪০টি ক্যাটাগরি (অবিকল অপরিবর্তিত রাখা হয়েছে যাতে ID পরিবর্তন না হয়) ---
             ['name_en' => 'Cook', 'name_ar' => 'طباخ', 'name_bn' => 'রাঁধুনি', 'icon' => 'heroicon-o-fire', 'sort_order' => 1],
             ['name_en' => 'Driver (Light)', 'name_ar' => 'سائق خفيف', 'name_bn' => 'ড্রাইভার (হালকা)', 'icon' => 'heroicon-o-truck', 'sort_order' => 2],
             ['name_en' => 'Driver (Heavy)', 'name_ar' => 'سائق ثقيل', 'name_bn' => 'ড্রাইভার (ভারী)', 'icon' => 'heroicon-o-truck', 'sort_order' => 3],
@@ -52,7 +52,7 @@ class SkillCategoriesSeeder extends Seeder
             ['name_en' => 'Office Boy', 'name_ar' => 'فراش مكتب', 'name_bn' => 'অফিস বয়', 'icon' => 'heroicon-o-building-office', 'sort_order' => 39],
             ['name_en' => 'Warehouse Worker', 'name_ar' => 'عامل مستودع', 'name_bn' => 'গুদামঘর কর্মী', 'icon' => 'heroicon-o-archive-box', 'sort_order' => 40],
 
-            // --- নতুন অতিরিক্ত ক্যাটাগরিগুলো নিচে যুক্ত করা হলো ---
+            // --- ২. নতুন অতিরিক্ত ক্যাটাগরিগুলো নিচে যুক্ত করা হলো ---
             ['name_en' => 'Accountant (Junior)', 'name_ar' => 'محاسب مبتدئ', 'name_bn' => 'হিসাবরক্ষক (জুনিয়র)', 'icon' => 'heroicon-o-calculator', 'sort_order' => 41],
             ['name_en' => 'Aluminium Fabricator', 'name_ar' => 'فني ألمنيوم', 'name_bn' => 'অ্যালুমিনিয়াম ফেব্রিকেটর', 'icon' => 'heroicon-o-wrench', 'sort_order' => 42],
             ['name_en' => 'Ambulance Driver', 'name_ar' => 'سائق إسعاف', 'name_bn' => 'অ্যাম্বুলেন্স ড্রাইভার', 'icon' => 'heroicon-o-truck', 'sort_order' => 43],
@@ -119,7 +119,7 @@ class SkillCategoriesSeeder extends Seeder
             ['name_en' => 'Tire Technician (Vulcanizer)', 'name_ar' => 'فني إطارات', 'name_bn' => 'টায়ার টেকনিশিয়ান', 'icon' => 'heroicon-o-cog-6-tooth', 'sort_order' => 104],
             ['name_en' => 'Trailer Driver', 'name_ar' => 'سائق مقطورة', 'name_bn' => 'ট্রেইলার ড্রাইভার', 'icon' => 'heroicon-o-truck', 'sort_order' => 105],
             ['name_en' => 'Waiter/Waitress', 'name_ar' => 'نادل / نادلة', 'name_bn' => 'ওয়েটার / ওয়েট্রেস', 'icon' => 'heroicon-o-user', 'sort_order' => 106],
-            ['name_en' => 'Watchman', 'name_ar' => 'حارس', 'name_bn' => 'ওয়াচম্যান', 'icon' => 'heroicon-o-shield-check', 'sort_order' => 107],
+            ['name_en' => 'Watchman', 'name_ar' => 'حارس', 'name_bn' => 'ওয়াچম্যান', 'icon' => 'heroicon-o-shield-check', 'sort_order' => 107],
             ['name_en' => 'Others', 'name_ar' => 'أخرى', 'name_bn' => 'অন্যান্য', 'icon' => 'heroicon-o-ellipsis-horizontal', 'sort_order' => 999],
         ];
 
@@ -130,6 +130,6 @@ class SkillCategoriesSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ SkillCategories সিড হয়েছে: ' . count($categories) . 'টি ক্যাটাগরি');
+        $this->command->info('✅ SkillCategories সিড সফল হয়েছে: ' . count($categories) . 'টি ক্যাটাগরি প্রসেস করা হয়েছে।');
     }
 }
